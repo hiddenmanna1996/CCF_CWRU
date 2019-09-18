@@ -1,0 +1,14 @@
+
+
+Proportional Hazard Test of Simple Cox on coxph for Time_to_Death 
+       rho chisq      p
+TrtB 0.182   3.4 0.0653
+
+Proportional Hazard Test of Simple Cox on coxph for Time_to_DM 
+         rho  chisq     p
+TrtB -0.0415 0.0664 0.797
+
+Proportional Hazard Test of Simple Cox on coxph for Time_to_LR 
+         rho chisq     p
+TrtB -0.0567  0.14 0.709
+

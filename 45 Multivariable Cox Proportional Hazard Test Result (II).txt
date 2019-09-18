@@ -1,0 +1,53 @@
+
+
+PH Test of MV Cox on cph for Time_to_Death 
+                                      rho    chisq     p
+Trt=B                             0.09175 8.96e-01 0.344
+demo_1=MALE                       0.06709 4.32e-01 0.511
+demo_2=ASIAN                      0.10574 1.04e+00 0.307
+demo_2=ASIAN OR PACIFIC ISLANDER  0.01642 6.76e-05 0.993
+demo_2=CAUCASIAN                  0.00845 7.36e-03 0.932
+demo_2=HISPANIC                   0.01655 2.77e-02 0.868
+demo_3                           -0.08112 8.15e-01 0.367
+clinic_1                          0.13511 1.89e+00 0.170
+clinic_2=1                        0.07784 5.76e-01 0.448
+clinic_3=NOS                     -0.12204 1.51e+00 0.219
+clinic_3=SQUAMOUS                -0.09681 9.84e-01 0.321
+clinic_4=II                      -0.09272 9.88e-01 0.320
+clinic_4=III                     -0.06352 4.65e-01 0.495
+GLOBAL                                 NA 1.15e+01 0.570
+
+PH Test of MV Cox on cph for Time_to_DM 
+                                     rho    chisq      p
+Trt=B                            -0.0516  0.09616 0.7565
+demo_1=MALE                      -0.3822  5.17681 0.0229
+demo_2=ASIAN                     -0.2493  0.01212 0.9123
+demo_2=ASIAN OR PACIFIC ISLANDER -0.0956  0.00054 0.9815
+demo_2=CAUCASIAN                 -0.1007  0.41506 0.5194
+demo_2=HISPANIC                   0.0467  0.08571 0.7697
+demo_3                           -0.1497  1.03300 0.3095
+clinic_1                         -0.2755  3.20709 0.0733
+clinic_2=1                       -0.2209  2.15357 0.1422
+clinic_3=NOS                     -0.1870  1.66242 0.1973
+clinic_3=SQUAMOUS                 0.0739  0.24460 0.6209
+clinic_4=II                      -0.2355  2.51961 0.1124
+clinic_4=III                     -0.2724  3.08678 0.0789
+GLOBAL                                NA 20.36828 0.0864
+
+PH Test of MV Cox on cph for Time_to_LR 
+                                     rho    chisq       p
+Trt=B                            -0.1138 5.63e-01 0.45319
+demo_1=MALE                       0.1538 9.51e-01 0.32941
+demo_2=ASIAN                     -0.0337 7.25e-05 0.99321
+demo_2=ASIAN OR PACIFIC ISLANDER -0.1673 4.92e-04 0.98230
+demo_2=CAUCASIAN                  0.0625 1.93e-01 0.66014
+demo_2=HISPANIC                   0.1308 7.77e-01 0.37810
+demo_3                           -0.1371 9.36e-01 0.33338
+clinic_1                         -0.1433 1.19e+00 0.27590
+clinic_2=1                        0.1277 9.00e-01 0.34266
+clinic_3=NOS                      0.0248 2.16e-05 0.99629
+clinic_3=SQUAMOUS                -0.2877 4.16e+00 0.04139
+clinic_4=II                      -0.1152 6.54e-01 0.41869
+clinic_4=III                     -0.4077 7.18e+00 0.00736
+GLOBAL                                NA 1.54e+01 0.28023
+

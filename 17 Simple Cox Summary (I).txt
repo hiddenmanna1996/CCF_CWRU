@@ -1,0 +1,59 @@
+
+
+Time_to_Death 
+Call:
+coxph(formula = Surv(time, recur) ~ Trt)
+
+  n= 200, number of events= 94 
+
+         coef exp(coef) se(coef)      z Pr(>|z|)
+TrtB -0.02523   0.97509  0.22200 -0.114     0.91
+
+     exp(coef) exp(-coef) lower .95 upper .95
+TrtB    0.9751      1.026    0.6311     1.507
+
+Concordance= 0.523  (se = 0.027 )
+Rsquare= 0   (max possible= 0.989 )
+Likelihood ratio test= 0.01  on 1 df,   p=0.9
+Wald test            = 0.01  on 1 df,   p=0.9
+Score (logrank) test = 0.01  on 1 df,   p=0.9
+
+
+Time_to_DM 
+Call:
+coxph(formula = Surv(time, recur) ~ Trt)
+
+  n= 199, number of events= 39 
+
+        coef exp(coef) se(coef)      z Pr(>|z|)
+TrtB -0.5057    0.6031   0.3215 -1.573    0.116
+
+     exp(coef) exp(-coef) lower .95 upper .95
+TrtB    0.6031      1.658    0.3211     1.133
+
+Concordance= 0.557  (se = 0.039 )
+Rsquare= 0.012   (max possible= 0.862 )
+Likelihood ratio test= 2.42  on 1 df,   p=0.1
+Wald test            = 2.47  on 1 df,   p=0.1
+Score (logrank) test = 2.53  on 1 df,   p=0.1
+
+
+Time_to_LR 
+Call:
+coxph(formula = Surv(time, recur) ~ Trt)
+
+  n= 199, number of events= 44 
+
+        coef exp(coef) se(coef)      z Pr(>|z|)
+TrtB -0.4991    0.6071   0.3059 -1.631    0.103
+
+     exp(coef) exp(-coef) lower .95 upper .95
+TrtB    0.6071      1.647    0.3333     1.106
+
+Concordance= 0.555  (se = 0.037 )
+Rsquare= 0.013   (max possible= 0.889 )
+Likelihood ratio test= 2.6  on 1 df,   p=0.1
+Wald test            = 2.66  on 1 df,   p=0.1
+Score (logrank) test = 2.72  on 1 df,   p=0.1
+
+

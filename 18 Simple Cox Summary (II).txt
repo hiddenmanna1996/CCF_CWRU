@@ -1,0 +1,53 @@
+
+
+Time_to_Death 
+Cox Proportional Hazards Model
+ 
+ cph(formula = dsurv ~ Trt, data = d, x = TRUE, y = TRUE, surv = TRUE)
+ 
+                      Model Tests       Discrimination    
+                                           Indexes        
+ Obs        200    LR chi2      0.01    R2       0.000    
+ Events      94    d.f.            1    Dxy      0.046    
+ Center -0.0163    Pr(> chi2) 0.9096    g        0.012    
+                   Score chi2   0.01    gr       1.012    
+                   Pr(> chi2) 0.9095                      
+ 
+       Coef    S.E.   Wald Z Pr(>|Z|)
+ Trt=B -0.0253 0.2220 -0.11  0.9093  
+ 
+
+Time_to_DM 
+Cox Proportional Hazards Model
+ 
+ cph(formula = dsurv ~ Trt, data = d, x = TRUE, y = TRUE, surv = TRUE)
+ 
+                      Model Tests       Discrimination    
+                                           Indexes        
+ Obs        199    LR chi2      2.42    R2       0.014    
+ Events      39    d.f.            1    Dxy      0.114    
+ Center -0.3253    Pr(> chi2) 0.1200    g        0.233    
+                   Score chi2   2.53    gr       1.263    
+                   Pr(> chi2) 0.1119                      
+ 
+       Coef    S.E.   Wald Z Pr(>|Z|)
+ Trt=B -0.5058 0.3215 -1.57  0.1157  
+ 
+
+Time_to_LR 
+Cox Proportional Hazards Model
+ 
+ cph(formula = dsurv ~ Trt, data = d, x = TRUE, y = TRUE, surv = TRUE)
+ 
+                     Model Tests       Discrimination    
+                                          Indexes        
+ Obs       199    LR chi2      2.60    R2       0.015    
+ Events     44    d.f.            1    Dxy      0.110    
+ Center -0.321    Pr(> chi2) 0.1066    g        0.230    
+                  Score chi2   2.72    gr       1.259    
+                  Pr(> chi2) 0.0993                      
+ 
+       Coef    S.E.   Wald Z Pr(>|Z|)
+ Trt=B -0.4991 0.3059 -1.63  0.1028  
+ 
+

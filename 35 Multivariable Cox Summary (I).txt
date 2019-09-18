@@ -1,0 +1,224 @@
+
+
+Time_to_Death 
+Call:
+coxph(formula = Surv(time, recur) ~ Trt + demo_1 + demo_2 + demo_3 + 
+    clinic_1 + clinic_2 + clinic_3 + clinic_4)
+
+  n= 200, number of events= 94 
+
+                                      coef  exp(coef)   se(coef)
+TrtB                             1.676e-01  1.182e+00  2.374e-01
+demo_1MALE                       9.883e-02  1.104e+00  2.227e-01
+demo_2ASIAN                      5.328e-01  1.704e+00  1.172e+00
+demo_2ASIAN OR PACIFIC ISLANDER -1.218e+01  5.152e-06  2.280e+03
+demo_2CAUCASIAN                  6.379e-01  1.893e+00  6.052e-01
+demo_2HISPANIC                   9.886e-01  2.687e+00  7.957e-01
+demo_3                           4.458e-02  1.046e+00  1.417e-02
+clinic_1                         6.077e-03  1.006e+00  1.184e-02
+clinic_21                        8.310e-01  2.296e+00  3.698e-01
+clinic_3NOS                     -1.297e+00  2.734e-01  1.038e+00
+clinic_3SQUAMOUS                 6.084e-01  1.837e+00  2.361e-01
+clinic_4II                       1.099e+00  3.001e+00  2.623e-01
+clinic_4III                      1.228e+00  3.414e+00  3.379e-01
+                                     z Pr(>|z|)    
+TrtB                             0.706  0.48028    
+demo_1MALE                       0.444  0.65717    
+demo_2ASIAN                      0.454  0.64952    
+demo_2ASIAN OR PACIFIC ISLANDER -0.005  0.99574    
+demo_2CAUCASIAN                  1.054  0.29187    
+demo_2HISPANIC                   1.242  0.21406    
+demo_3                           3.145  0.00166 ** 
+clinic_1                         0.513  0.60774    
+clinic_21                        2.247  0.02463 *  
+clinic_3NOS                     -1.249  0.21168    
+clinic_3SQUAMOUS                 2.577  0.00997 ** 
+clinic_4II                       4.189  2.8e-05 ***
+clinic_4III                      3.634  0.00028 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+                                exp(coef) exp(-coef) lower .95
+TrtB                            1.182e+00  8.457e-01   0.74250
+demo_1MALE                      1.104e+00  9.059e-01   0.71347
+demo_2ASIAN                     1.704e+00  5.870e-01   0.17115
+demo_2ASIAN OR PACIFIC ISLANDER 5.152e-06  1.941e+05   0.00000
+demo_2CAUCASIAN                 1.893e+00  5.284e-01   0.57793
+demo_2HISPANIC                  2.687e+00  3.721e-01   0.56503
+demo_3                          1.046e+00  9.564e-01   1.01694
+clinic_1                        1.006e+00  9.939e-01   0.98302
+clinic_21                       2.296e+00  4.356e-01   1.11206
+clinic_3NOS                     2.734e-01  3.658e+00   0.03571
+clinic_3SQUAMOUS                1.837e+00  5.442e-01   1.15681
+clinic_4II                      3.001e+00  3.333e-01   1.79443
+clinic_4III                     3.414e+00  2.929e-01   1.76037
+                                upper .95
+TrtB                                1.883
+demo_1MALE                          1.708
+demo_2ASIAN                        16.959
+demo_2ASIAN OR PACIFIC ISLANDER       Inf
+demo_2CAUCASIAN                     6.198
+demo_2HISPANIC                     12.783
+demo_3                              1.075
+clinic_1                            1.030
+clinic_21                           4.739
+clinic_3NOS                         2.092
+clinic_3SQUAMOUS                    2.919
+clinic_4II                          5.017
+clinic_4III                         6.620
+
+Concordance= 0.726  (se = 0.032 )
+Rsquare= 0.234   (max possible= 0.989 )
+Likelihood ratio test= 53.27  on 13 df,   p=8e-07
+Wald test            = 50.37  on 13 df,   p=3e-06
+Score (logrank) test = 54.95  on 13 df,   p=4e-07
+
+
+Time_to_DM 
+Call:
+coxph(formula = Surv(time, recur) ~ Trt + demo_1 + demo_2 + demo_3 + 
+    clinic_1 + clinic_2 + clinic_3 + clinic_4)
+
+  n= 199, number of events= 39 
+
+                                      coef  exp(coef)   se(coef)
+TrtB                            -4.120e-01  6.623e-01  3.452e-01
+demo_1MALE                      -1.554e-01  8.561e-01  3.325e-01
+demo_2ASIAN                     -1.516e+01  2.612e-07  3.906e+03
+demo_2ASIAN OR PACIFIC ISLANDER -1.568e+01  1.548e-07  7.865e+03
+demo_2CAUCASIAN                  8.815e-01  2.414e+00  1.033e+00
+demo_2HISPANIC                   1.304e+00  3.684e+00  1.269e+00
+demo_3                          -2.404e-02  9.762e-01  1.960e-02
+clinic_1                         1.837e-02  1.019e+00  2.010e-02
+clinic_21                        1.630e-01  1.177e+00  6.516e-01
+clinic_3NOS                     -2.533e-01  7.762e-01  1.090e+00
+clinic_3SQUAMOUS                 5.674e-02  1.058e+00  3.758e-01
+clinic_4II                       1.283e+00  3.608e+00  3.906e-01
+clinic_4III                      9.934e-01  2.700e+00  5.468e-01
+                                     z Pr(>|z|)   
+TrtB                            -1.193  0.23275   
+demo_1MALE                      -0.467  0.64024   
+demo_2ASIAN                     -0.004  0.99690   
+demo_2ASIAN OR PACIFIC ISLANDER -0.002  0.99841   
+demo_2CAUCASIAN                  0.854  0.39337   
+demo_2HISPANIC                   1.028  0.30397   
+demo_3                          -1.227  0.21988   
+clinic_1                         0.914  0.36082   
+clinic_21                        0.250  0.80249   
+clinic_3NOS                     -0.232  0.81624   
+clinic_3SQUAMOUS                 0.151  0.88001   
+clinic_4II                       3.285  0.00102 **
+clinic_4III                      1.817  0.06927 . 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+                                exp(coef) exp(-coef) lower .95
+TrtB                            6.623e-01  1.510e+00   0.33668
+demo_1MALE                      8.561e-01  1.168e+00   0.44619
+demo_2ASIAN                     2.612e-07  3.828e+06   0.00000
+demo_2ASIAN OR PACIFIC ISLANDER 1.548e-07  6.460e+06   0.00000
+demo_2CAUCASIAN                 2.414e+00  4.142e-01   0.31897
+demo_2HISPANIC                  3.684e+00  2.714e-01   0.30655
+demo_3                          9.762e-01  1.024e+00   0.93946
+clinic_1                        1.019e+00  9.818e-01   0.97919
+clinic_21                       1.177e+00  8.496e-01   0.32822
+clinic_3NOS                     7.762e-01  1.288e+00   0.09163
+clinic_3SQUAMOUS                1.058e+00  9.448e-01   0.50668
+clinic_4II                      3.608e+00  2.771e-01   1.67813
+clinic_4III                     2.700e+00  3.703e-01   0.92464
+                                upper .95
+TrtB                                1.303
+demo_1MALE                          1.643
+demo_2ASIAN                           Inf
+demo_2ASIAN OR PACIFIC ISLANDER       Inf
+demo_2CAUCASIAN                    18.276
+demo_2HISPANIC                     44.285
+demo_3                              1.014
+clinic_1                            1.059
+clinic_21                           4.221
+clinic_3NOS                         6.575
+clinic_3SQUAMOUS                    2.211
+clinic_4II                          7.758
+clinic_4III                         7.886
+
+Concordance= 0.715  (se = 0.047 )
+Rsquare= 0.109   (max possible= 0.862 )
+Likelihood ratio test= 22.89  on 13 df,   p=0.04
+Wald test            = 21.03  on 13 df,   p=0.07
+Score (logrank) test = 25.12  on 13 df,   p=0.02
+
+
+Time_to_LR 
+Call:
+coxph(formula = Surv(time, recur) ~ Trt + demo_1 + demo_2 + demo_3 + 
+    clinic_1 + clinic_2 + clinic_3 + clinic_4)
+
+  n= 199, number of events= 44 
+
+                                      coef  exp(coef)   se(coef)
+TrtB                            -3.589e-01  6.985e-01  3.247e-01
+demo_1MALE                       1.433e-01  1.154e+00  3.136e-01
+demo_2ASIAN                     -1.771e+01  2.035e-08  6.219e+03
+demo_2ASIAN OR PACIFIC ISLANDER -1.824e+01  1.196e-08  1.182e+04
+demo_2CAUCASIAN                 -7.890e-01  4.543e-01  5.490e-01
+demo_2HISPANIC                  -1.943e-01  8.234e-01  9.001e-01
+demo_3                          -1.193e-02  9.881e-01  1.849e-02
+clinic_1                         1.562e-02  1.016e+00  1.894e-02
+clinic_21                        8.404e-01  2.317e+00  5.273e-01
+clinic_3NOS                     -1.751e+01  2.486e-08  5.422e+03
+clinic_3SQUAMOUS                 3.276e-01  1.388e+00  3.539e-01
+clinic_4II                       7.271e-01  2.069e+00  3.746e-01
+clinic_4III                      7.633e-01  2.145e+00  5.171e-01
+                                     z Pr(>|z|)  
+TrtB                            -1.105   0.2690  
+demo_1MALE                       0.457   0.6477  
+demo_2ASIAN                     -0.003   0.9977  
+demo_2ASIAN OR PACIFIC ISLANDER -0.002   0.9988  
+demo_2CAUCASIAN                 -1.437   0.1507  
+demo_2HISPANIC                  -0.216   0.8291  
+demo_3                          -0.646   0.5186  
+clinic_1                         0.825   0.4095  
+clinic_21                        1.594   0.1110  
+clinic_3NOS                     -0.003   0.9974  
+clinic_3SQUAMOUS                 0.926   0.3546  
+clinic_4II                       1.941   0.0523 .
+clinic_4III                      1.476   0.1399  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+                                exp(coef) exp(-coef) lower .95
+TrtB                            6.985e-01  1.432e+00    0.3696
+demo_1MALE                      1.154e+00  8.665e-01    0.6242
+demo_2ASIAN                     2.035e-08  4.915e+07    0.0000
+demo_2ASIAN OR PACIFIC ISLANDER 1.196e-08  8.363e+07    0.0000
+demo_2CAUCASIAN                 4.543e-01  2.201e+00    0.1549
+demo_2HISPANIC                  8.234e-01  1.214e+00    0.1411
+demo_3                          9.881e-01  1.012e+00    0.9530
+clinic_1                        1.016e+00  9.845e-01    0.9787
+clinic_21                       2.317e+00  4.315e-01    0.8245
+clinic_3NOS                     2.486e-08  4.023e+07    0.0000
+clinic_3SQUAMOUS                1.388e+00  7.206e-01    0.6934
+clinic_4II                      2.069e+00  4.833e-01    0.9929
+clinic_4III                     2.145e+00  4.661e-01    0.7786
+                                upper .95
+TrtB                                1.320
+demo_1MALE                          2.134
+demo_2ASIAN                           Inf
+demo_2ASIAN OR PACIFIC ISLANDER       Inf
+demo_2CAUCASIAN                     1.332
+demo_2HISPANIC                      4.806
+demo_3                              1.025
+clinic_1                            1.054
+clinic_21                           6.513
+clinic_3NOS                           Inf
+clinic_3SQUAMOUS                    2.777
+clinic_4II                          4.312
+clinic_4III                         5.912
+
+Concordance= 0.7  (se = 0.045 )
+Rsquare= 0.101   (max possible= 0.889 )
+Likelihood ratio test= 21.14  on 13 df,   p=0.07
+Wald test            = 17.76  on 13 df,   p=0.2
+Score (logrank) test = 22.46  on 13 df,   p=0.05
+
+

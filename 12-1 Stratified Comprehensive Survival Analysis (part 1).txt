@@ -1,0 +1,59 @@
+
+
+Time_to_Death 
+      records n.max n.start events   *rmean *se(rmean)    median
+Trt=A      71    71      71     40 80.56643   5.022622 109.07895
+Trt=B     129   129     129     54 84.57853   3.505672  95.65789
+       0.95LCL 0.95UCL
+Trt=A 73.38816      NA
+Trt=B 88.65132      NA
+Analysis by Trt:
+Overall Analysis:
+character(0)
+
+Descriptive Statistics per Subgroup:
+character(0)
+
+Hazard Ratio:
+character(0)
+
+
+
+Time_to_DM 
+      records n.max n.start events   *rmean *se(rmean) median
+Trt=A      71    71      71     18 3407.975   209.9823     NA
+Trt=B     128   128     128     21 3786.297   132.2854     NA
+      0.95LCL 0.95UCL
+Trt=A      NA      NA
+Trt=B      NA      NA
+Analysis by Trt:
+Overall Analysis:
+character(0)
+
+Descriptive Statistics per Subgroup:
+character(0)
+
+Hazard Ratio:
+character(0)
+
+
+
+Time_to_LR 
+      records n.max n.start events   *rmean *se(rmean) median
+Trt=A      71    71      71     21 3249.030   215.9392     NA
+Trt=B     128   128     128     23 3701.153   140.5943     NA
+      0.95LCL 0.95UCL
+Trt=A    3635      NA
+Trt=B      NA      NA
+Analysis by Trt:
+Overall Analysis:
+character(0)
+
+Descriptive Statistics per Subgroup:
+character(0)
+
+Hazard Ratio:
+character(0)
+
+
+

@@ -1,0 +1,95 @@
+
+
+Time_to_Death 
+Cox Proportional Hazards Model
+ 
+ cph(formula = dsurv ~ Trt + demo_1 + demo_2 + demo_3 + clinic_1 + 
+     clinic_2 + clinic_3 + clinic_4, data = d, x = TRUE, y = TRUE, 
+     surv = TRUE)
+ 
+                     Model Tests       Discrimination    
+                                          Indexes        
+ Obs       200    LR chi2     53.26    R2       0.237    
+ Events     94    d.f.           13    Dxy      0.453    
+ Center 4.8702    Pr(> chi2) 0.0000    g        0.990    
+                  Score chi2  54.95    gr       2.692    
+                  Pr(> chi2) 0.0000                      
+ 
+                                  Coef    S.E.    Wald Z Pr(>|Z|)
+ Trt=B                             0.1676  0.2374  0.71  0.4803  
+ demo_1=MALE                       0.0988  0.2227  0.44  0.6572  
+ demo_2=ASIAN                      0.5328  1.1725  0.45  0.6495  
+ demo_2=ASIAN OR PACIFIC ISLANDER -2.1761 15.3802 -0.14  0.8875  
+ demo_2=CAUCASIAN                  0.6379  0.6053  1.05  0.2919  
+ demo_2=HISPANIC                   0.9886  0.7957  1.24  0.2141  
+ demo_3                            0.0446  0.0142  3.15  0.0017  
+ clinic_1                          0.0061  0.0118  0.51  0.6078  
+ clinic_2=1                        0.8310  0.3698  2.25  0.0246  
+ clinic_3=NOS                     -1.2970  1.0385 -1.25  0.2117  
+ clinic_3=SQUAMOUS                 0.6084  0.2361  2.58  0.0100  
+ clinic_4=II                       1.0988  0.2623  4.19  <0.0001 
+ clinic_4=III                      1.2278  0.3379  3.63  0.0003  
+ 
+
+Time_to_DM 
+Cox Proportional Hazards Model
+ 
+ cph(formula = dsurv ~ Trt + demo_1 + demo_2 + demo_3 + clinic_1 + 
+     clinic_2 + clinic_3 + clinic_4, data = d, x = TRUE, y = TRUE, 
+     surv = TRUE)
+ 
+                     Model Tests       Discrimination    
+                                          Indexes        
+ Obs       199    LR chi2     22.88    R2       0.126    
+ Events     39    d.f.           13    Dxy      0.430    
+ Center 0.7698    Pr(> chi2) 0.0431    g        0.990    
+                  Score chi2  25.12    gr       2.691    
+                  Pr(> chi2) 0.0223                      
+ 
+                                  Coef    S.E.    Wald Z Pr(>|Z|)
+ Trt=B                            -0.4120  0.3452 -1.19  0.2327  
+ demo_1=MALE                      -0.1554  0.3325 -0.47  0.6403  
+ demo_2=ASIAN                     -4.1576 15.9963 -0.26  0.7949  
+ demo_2=ASIAN OR PACIFIC ISLANDER -4.6809 32.1595 -0.15  0.8843  
+ demo_2=CAUCASIAN                  0.8815  1.0328  0.85  0.3934  
+ demo_2=HISPANIC                   1.3041  1.2687  1.03  0.3040  
+ demo_3                           -0.0240  0.0196 -1.23  0.2199  
+ clinic_1                          0.0184  0.0201  0.91  0.3608  
+ clinic_2=1                        0.1630  0.6516  0.25  0.8025  
+ clinic_3=NOS                     -0.2533  1.0902 -0.23  0.8162  
+ clinic_3=SQUAMOUS                 0.0567  0.3758  0.15  0.8800  
+ clinic_4=II                       1.2832  0.3906  3.29  0.0010  
+ clinic_4=III                      0.9934  0.5468  1.82  0.0693  
+ 
+
+Time_to_LR 
+Cox Proportional Hazards Model
+ 
+ cph(formula = dsurv ~ Trt + demo_1 + demo_2 + demo_3 + clinic_1 + 
+     clinic_2 + clinic_3 + clinic_4, data = d, x = TRUE, y = TRUE, 
+     surv = TRUE)
+ 
+                      Model Tests       Discrimination    
+                                           Indexes        
+ Obs        199    LR chi2     21.12    R2       0.113    
+ Events      44    d.f.           13    Dxy      0.400    
+ Center -0.2002    Pr(> chi2) 0.0706    g        1.068    
+                   Score chi2  22.46    gr       2.911    
+                   Pr(> chi2) 0.0487                      
+ 
+                                  Coef    S.E.    Wald Z Pr(>|Z|)
+ Trt=B                            -0.3589  0.3247 -1.11  0.2691  
+ demo_1=MALE                       0.1433  0.3137  0.46  0.6477  
+ demo_2=ASIAN                     -5.7100 15.4250 -0.37  0.7113  
+ demo_2=ASIAN OR PACIFIC ISLANDER -6.2416 29.3098 -0.21  0.8314  
+ demo_2=CAUCASIAN                 -0.7890  0.5491 -1.44  0.1507  
+ demo_2=HISPANIC                  -0.1943  0.9000 -0.22  0.8291  
+ demo_3                           -0.0119  0.0185 -0.65  0.5186  
+ clinic_1                          0.0156  0.0189  0.82  0.4095  
+ clinic_2=1                        0.8404  0.5273  1.59  0.1110  
+ clinic_3=NOS                     -5.5097 13.4471 -0.41  0.6820  
+ clinic_3=SQUAMOUS                 0.3276  0.3539  0.93  0.3547  
+ clinic_4=II                       0.7271  0.3747  1.94  0.0523  
+ clinic_4=III                      0.7633  0.5171  1.48  0.1399  
+ 
+

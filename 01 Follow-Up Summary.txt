@@ -1,0 +1,50 @@
+
+Counts of recurrence (0/1) by events 
+
+Note: The event of Death is considered as 'recurrence', even though death is not a case of recurrence 
+
+OS_Event
+  0   1 
+106  94 
+
+DM_Event
+  0   1 
+160  39 
+
+LR_Event
+  0   1 
+155  44 
+
+
+Statistical summary of Time stratified by Recurrence (0/1) 
+
+
+Time_to_Death 
+Event$recur: 0
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  21.61   79.24   88.87   90.89  106.36  120.00 
+--------------------------------------------------- 
+Event$recur: 1
+    Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+  0.5263  18.4951  47.3026  50.9868  80.8470 120.0000 
+
+
+Time_to_DM 
+Event$recur: 0
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+     11    1788    2426    2301    2848    5413 
+--------------------------------------------------- 
+Event$recur: 1
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   44.0   331.0   594.0   800.6  1139.5  2520.0 
+
+
+Time_to_LR 
+Event$recur: 0
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+     11    1616    2390    2232    2886    5413 
+--------------------------------------------------- 
+Event$recur: 1
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   88.0   355.8   643.5   841.3  1249.8  3635.0 
+

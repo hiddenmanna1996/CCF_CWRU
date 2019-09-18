@@ -1,0 +1,182 @@
+
+
+Time_to_Death 
+trt A=0, trt B=1
+             Effects              Response : dsurv 
+
+ Factor                                       Low High Diff.
+ Trt                                           0   1    1   
+  Hazard Ratio                                 0   1    1   
+ demo_3                                       61  73   12   
+  Hazard Ratio                                61  73   12   
+ clinic_1                                     80  90   10   
+  Hazard Ratio                                80  90   10   
+ demo_1 - FEMALE:MALE                          2   1   NA   
+  Hazard Ratio                                 2   1   NA   
+ demo_2 - AFRICAN AMERICAN:CAUCASIAN           4   1   NA   
+  Hazard Ratio                                 4   1   NA   
+ demo_2 - ASIAN:CAUCASIAN                      4   2   NA   
+  Hazard Ratio                                 4   2   NA   
+ demo_2 - ASIAN OR PACIFIC ISLANDER:CAUCASIAN  4   3   NA   
+  Hazard Ratio                                 4   3   NA   
+ demo_2 - HISPANIC:CAUCASIAN                   4   5   NA   
+  Hazard Ratio                                 4   5   NA   
+ clinic_2 - 1:0                                1   2   NA   
+  Hazard Ratio                                 1   2   NA   
+ clinic_3 - NOS:ADENOCARCINOMA                 1   2   NA   
+  Hazard Ratio                                 1   2   NA   
+ clinic_3 - SQUAMOUS:ADENOCARCINOMA            1   3   NA   
+  Hazard Ratio                                 1   3   NA   
+ clinic_4 - II:I                               1   2   NA   
+  Hazard Ratio                                 1   2   NA   
+ clinic_4 - III:I                              1   3   NA   
+  Hazard Ratio                                 1   3   NA   
+ Effect    S.E.     Lower 0.95  Upper 0.95
+  0.167570  0.23741 -2.9774e-01 6.3289e-01
+  1.182400       NA  7.4249e-01 1.8830e+00
+  0.534910  0.17008  2.0156e-01 8.6825e-01
+  1.707300       NA  1.2233e+00 2.3827e+00
+  0.060771  0.11840 -1.7128e-01 2.9282e-01
+  1.062700       NA  8.4258e-01 1.3402e+00
+ -0.098831  0.22268 -5.3528e-01 3.3762e-01
+  0.905900       NA  5.8550e-01 1.4016e+00
+ -0.637950  0.60526 -1.8242e+00 5.4833e-01
+  0.528380       NA  1.6134e-01 1.7304e+00
+ -0.105140  1.02690 -2.1179e+00 1.9076e+00
+  0.900200       NA  1.2029e-01 6.7369e+00
+ -2.814000 15.36900 -3.2937e+01 2.7309e+01
+  0.059964       NA  4.9629e-15 7.2452e+11
+  0.350660  0.53837 -7.0452e-01 1.4058e+00
+  1.420000       NA  4.9434e-01 4.0790e+00
+  0.830990  0.36980  1.0619e-01 1.5558e+00
+  2.295600       NA  1.1120e+00 4.7388e+00
+ -1.297000  1.03850 -3.3323e+00 7.3838e-01
+  0.273360       NA  3.5711e-02 2.0925e+00
+  0.608400  0.23610  1.4565e-01 1.0711e+00
+  1.837500       NA  1.1568e+00 2.9187e+00
+  1.098800  0.26230  5.8467e-01 1.6129e+00
+  3.000500       NA  1.7944e+00 5.0173e+00
+  1.227800  0.33792  5.6551e-01 1.8901e+00
+  3.413800       NA  1.7603e+00 6.6203e+00
+
+
+Time_to_DM 
+trt A=0, trt B=1
+             Effects              Response : dsurv 
+
+ Factor                                       Low High Diff.
+ Trt                                           0   1    1   
+  Hazard Ratio                                 0   1    1   
+ demo_3                                       61  73   12   
+  Hazard Ratio                                61  73   12   
+ clinic_1                                     80  90   10   
+  Hazard Ratio                                80  90   10   
+ demo_1 - FEMALE:MALE                          2   1   NA   
+  Hazard Ratio                                 2   1   NA   
+ demo_2 - AFRICAN AMERICAN:CAUCASIAN           4   1   NA   
+  Hazard Ratio                                 4   1   NA   
+ demo_2 - ASIAN:CAUCASIAN                      4   2   NA   
+  Hazard Ratio                                 4   2   NA   
+ demo_2 - ASIAN OR PACIFIC ISLANDER:CAUCASIAN  4   3   NA   
+  Hazard Ratio                                 4   3   NA   
+ demo_2 - HISPANIC:CAUCASIAN                   4   5   NA   
+  Hazard Ratio                                 4   5   NA   
+ clinic_2 - 1:0                                1   2   NA   
+  Hazard Ratio                                 1   2   NA   
+ clinic_3 - NOS:ADENOCARCINOMA                 1   2   NA   
+  Hazard Ratio                                 1   2   NA   
+ clinic_3 - SQUAMOUS:ADENOCARCINOMA            1   3   NA   
+  Hazard Ratio                                 1   3   NA   
+ clinic_4 - II:I                               1   2   NA   
+  Hazard Ratio                                 1   2   NA   
+ clinic_4 - III:I                              1   3   NA   
+  Hazard Ratio                                 1   3   NA   
+ Effect     S.E.     Lower 0.95  Upper 0.95
+ -0.4119700  0.34523 -1.0886e+00 2.6467e-01
+  0.6623500       NA  3.3668e-01 1.3030e+00
+ -0.2885200  0.23518 -7.4947e-01 1.7242e-01
+  0.7493700       NA  4.7262e-01 1.1882e+00
+  0.1836800  0.20101 -2.1029e-01 5.7765e-01
+  1.2016000       NA  8.1035e-01 1.7818e+00
+  0.1553800  0.33249 -4.9628e-01 8.0704e-01
+  1.1681000       NA  6.0879e-01 2.2413e+00
+ -0.8814600  1.03280 -2.9057e+00 1.1428e+00
+  0.4141800       NA  5.4710e-02 3.1355e+00
+ -5.0391000 15.96600 -3.6332e+01 2.6254e+01
+  0.0064798       NA  1.6639e-16 2.5235e+11
+ -5.5623000 32.14400 -6.8564e+01 5.7439e+01
+  0.0038398       NA  1.6713e-30 8.8216e+24
+  0.4226700  0.77051 -1.0875e+00 1.9328e+00
+  1.5260000       NA  3.3705e-01 6.9092e+00
+  0.1629700  0.65160 -1.1141e+00 1.4401e+00
+  1.1770000       NA  3.2820e-01 4.2210e+00
+ -0.2533400  1.09020 -2.3902e+00 1.8835e+00
+  0.7762000       NA  9.1615e-02 6.5764e+00
+  0.0567360  0.37584 -6.7990e-01 7.9337e-01
+  1.0584000       NA  5.0667e-01 2.2108e+00
+  1.2832000  0.39061  5.1764e-01 2.0488e+00
+  3.6082000       NA  1.6781e+00 7.7586e+00
+  0.9933900  0.54685 -7.8418e-02 2.0652e+00
+  2.7004000       NA  9.2458e-01 7.8868e+00
+
+
+Time_to_LR 
+trt A=0, trt B=1
+             Effects              Response : dsurv 
+
+ Factor                                       Low High Diff.
+ Trt                                           0   1    1   
+  Hazard Ratio                                 0   1    1   
+ demo_3                                       61  73   12   
+  Hazard Ratio                                61  73   12   
+ clinic_1                                     80  90   10   
+  Hazard Ratio                                80  90   10   
+ demo_1 - FEMALE:MALE                          2   1   NA   
+  Hazard Ratio                                 2   1   NA   
+ demo_2 - AFRICAN AMERICAN:CAUCASIAN           4   1   NA   
+  Hazard Ratio                                 4   1   NA   
+ demo_2 - ASIAN:CAUCASIAN                      4   2   NA   
+  Hazard Ratio                                 4   2   NA   
+ demo_2 - ASIAN OR PACIFIC ISLANDER:CAUCASIAN  4   3   NA   
+  Hazard Ratio                                 4   3   NA   
+ demo_2 - HISPANIC:CAUCASIAN                   4   5   NA   
+  Hazard Ratio                                 4   5   NA   
+ clinic_2 - 1:0                                1   2   NA   
+  Hazard Ratio                                 1   2   NA   
+ clinic_3 - NOS:ADENOCARCINOMA                 1   2   NA   
+  Hazard Ratio                                 1   2   NA   
+ clinic_3 - SQUAMOUS:ADENOCARCINOMA            1   3   NA   
+  Hazard Ratio                                 1   3   NA   
+ clinic_4 - II:I                               1   2   NA   
+  Hazard Ratio                                 1   2   NA   
+ clinic_4 - III:I                              1   3   NA   
+  Hazard Ratio                                 1   3   NA   
+ Effect     S.E.     Lower 0.95  Upper 0.95
+ -0.3588700  0.32470 -9.9527e-01 2.7753e-01
+  0.6984700       NA  3.6963e-01 1.3199e+00
+ -0.1432100  0.22185 -5.7803e-01 2.9162e-01
+  0.8665700       NA  5.6100e-01 1.3386e+00
+  0.1562200  0.18942 -2.1504e-01 5.2748e-01
+  1.1691000       NA  8.0651e-01 1.6946e+00
+ -0.1433300  0.31365 -7.5808e-01 4.7142e-01
+  0.8664700       NA  4.6857e-01 1.6023e+00
+  0.7889900  0.54906 -2.8716e-01 1.8651e+00
+  2.2012000       NA  7.5039e-01 6.4568e+00
+ -4.9210000 15.41800 -3.5140e+01 2.5298e+01
+  0.0072920       NA  5.4818e-16 9.7001e+10
+ -5.4526000 29.30700 -6.2893e+01 5.1988e+01
+  0.0042853       NA  4.8531e-28 3.7839e+22
+  0.5947200  0.75044 -8.7612e-01 2.0655e+00
+  1.8125000       NA  4.1640e-01 7.8896e+00
+  0.8403800  0.52731 -1.9313e-01 1.8739e+00
+  2.3173000       NA  8.2437e-01 6.5137e+00
+ -5.5097000 13.44700 -3.1865e+01 2.0846e+01
+  0.0040473       NA  1.4488e-14 1.1306e+09
+  0.3276100  0.35395 -3.6612e-01 1.0213e+00
+  1.3876000       NA  6.9342e-01 2.7769e+00
+  0.7271100  0.37465 -7.2016e-03 1.4614e+00
+  2.0691000       NA  9.9282e-01 4.3121e+00
+  0.7633400  0.51714 -2.5024e-01 1.7769e+00
+  2.1454000       NA  7.7861e-01 5.9116e+00
+
+

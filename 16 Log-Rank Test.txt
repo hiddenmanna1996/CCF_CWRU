@@ -1,0 +1,32 @@
+
+
+Time_to_Death 
+Call:
+survdiff(formula = dsurv ~ d$Trt)
+
+          N Observed Expected (O-E)^2/E (O-E)^2/V
+d$Trt=A  71       40     39.5   0.00660    0.0129
+d$Trt=B 129       54     54.5   0.00478    0.0129
+
+ Chisq= 0  on 1 degrees of freedom, p= 0.9 
+
+Time_to_DM 
+Call:
+survdiff(formula = dsurv ~ d$Trt)
+
+          N Observed Expected (O-E)^2/E (O-E)^2/V
+d$Trt=A  71       18     13.3     1.659      2.52
+d$Trt=B 128       21     25.7     0.859      2.52
+
+ Chisq= 2.5  on 1 degrees of freedom, p= 0.1 
+
+Time_to_LR 
+Call:
+survdiff(formula = dsurv ~ d$Trt)
+
+          N Observed Expected (O-E)^2/E (O-E)^2/V
+d$Trt=A  71       21     15.9     1.665      2.72
+d$Trt=B 128       23     28.1     0.939      2.72
+
+ Chisq= 2.7  on 1 degrees of freedom, p= 0.1 
+

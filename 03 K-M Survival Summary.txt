@@ -1,0 +1,29 @@
+
+
+Time_to_Death 
+Call: survfit(formula = dfsurv[[i]] ~ 1, data = datList$fit.dat$Y.ttf[[i]])
+
+         n     events     *rmean *se(rmean)     median    0.95LCL 
+    200.00      94.00      84.93       2.95     101.09      89.67 
+   0.95UCL 
+    120.00 
+    * restricted mean with upper limit =  120 
+
+Time_to_DM 
+Call: survfit(formula = dfsurv[[i]] ~ 1, data = datList$fit.dat$Y.ttf[[i]])
+
+         n     events     *rmean *se(rmean)     median    0.95LCL 
+       199         39       4397        145         NA         NA 
+   0.95UCL 
+        NA 
+    * restricted mean with upper limit =  5413 
+
+Time_to_LR 
+Call: survfit(formula = dfsurv[[i]] ~ 1, data = datList$fit.dat$Y.ttf[[i]])
+
+         n     events     *rmean *se(rmean)     median    0.95LCL 
+       199         44       4143        193         NA         NA 
+   0.95UCL 
+        NA 
+    * restricted mean with upper limit =  5413 
+
