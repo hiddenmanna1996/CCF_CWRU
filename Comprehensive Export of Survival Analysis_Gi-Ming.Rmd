@@ -1,0 +1,2247 @@
+---
+title: "Survival Function and Analysis with CCF"
+Subtitle: "Based on Dr. Hobbs' Data List"
+author: "GI-MING WANG"
+date: "09/04/2019"
+output: 
+   html_document:
+        code_folding: show
+        number_sections: yes
+        toc: yes
+        toc_float: yes
+---
+
+```{r set-options, echo=FALSE, cache=FALSE}
+knitr::opts_chunk$set(comment=NA)
+
+```
+
+Important Notes:
+1. A faster option to do survival analysis is to jump to section "# Survival Anaysis", load the Workspace (in the code) which includes Data List and might cover most of the survival functions, and begin to run the code step by step.
+
+2. The functions before line 594 were developed by Dr. Hobbs.
+
+
+# Loading EDA-Example Workspace
+```{r Load EDA workplace, message=FALSE, warning=FALSE}
+library(stringr)
+library(survminer)
+library(readxl)
+library(dplyr)
+library(ggplot2)
+library(rms)
+
+load("D:/GI-Ming/000 CWRU Statistical Analyst/Projects/008 Survival Analysis for CCF/Data/eda-Example.RData")
+
+# load(D:/GI-Ming/000 CWRU Statistical Analyst/Projects/014 Survival Functions for CCF Data List/R Code/Workspace.RData")
+
+# load("E:/CWRU Projects/009 Survival Analysis for CCF/Data/eda-Example.RData")
+
+# The RData format (usually with extension .rdata or .rda) is a format designed for use with R, a system for statistical computation and related graphics, for storing a complete R workspace or selected "objects" from a workspace in a form that can be loaded back by R.
+
+# Saving on object in RData format:
+# save(data1, file = "data.RData")
+# Save multiple objects:
+# save(data1, data2, file = "data.RData")
+# To load the data again:
+# load("data.RData")
+
+```
+
+# Loading EDA Functions
+## Function checkFactorsForSymbols
+```{r function checkFactorsForSymbols, message=FALSE, warning=FALSE}
+checkFactorsForSymbols <- function(Y){
+  if( is.factor( Y ) ){
+   y <- str_trim( as.character( Y ) )
+   if( sum( grepl("/",y) )>0 ){ y <- str_replace_all(y, "\\/", ".") }
+   if( sum( grepl("..",y) )>0 ){ y <- str_replace_all(y, "\\.\\.", ".") }
+   if( sum( grepl("..",y) )>0 ){ y <- str_replace_all(y, "\\.\\.", ".") }
+   if( sum( grepl("..",y) )>0 ){ y <- str_replace_all(y, "\\.\\.", ".") }
+   if( sum( grepl("+",y) )>0 ){ y <- str_replace_all(y, "\\+", "plus") }
+   if( sum( grepl("-",y) )>0 ){ y <- str_replace_all(y, "\\-", "minus") }
+   if( sum( grepl("*",y) )>0 ){ y <- str_replace_all(y, "\\*", "star") }
+   if( sum( grepl(":",y) )>0 ){ y <- str_replace_all(y, "\\:", "colon") }
+   if( sum( grepl("^",y) )>0 ){ y <- str_replace_all(y, "\\^", "hat") }
+   if( sum( grepl("1",y) )>0 ){ y <- str_replace_all(y, "1",   "One") }
+   if( sum( grepl(">",y) )>0 ){ y <- str_replace_all(y, "\\>", "GT") }
+   if( sum( grepl("<",y) )>0 ){ y <- str_replace_all(y, "\\<", "LT") }
+   if( sum( grepl("=",y) )>0 ){ y <- str_replace_all(y, "\\=", "EQ") }
+   if( sum( grepl("~",y) )>0 ){ y <- str_replace_all(y, "\\~", "tilde") }
+   if( sum( grepl("?",y) )>0 ){ y <- str_replace_all(y, "\\?", "q") }
+   if( sum( grepl("|",y) )>0 ){ y <- str_replace_all(y, "\\|", "bar") }
+   if( sum( grepl("\\(",y) )>0 ){ y <- str_replace_all(y, "\\(", "_") }
+   if( sum( grepl("\\)",y) )>0 ){ y <- str_replace_all(y, "\\)", "_") }
+   out <- factor(y)
+  } else{ out <- Y }
+  return(out)
+}
+
+```
+
+## Function checkFactorsForSymbols.char
+```{r function checkFactorsForSymbolschar, message=FALSE, warning=FALSE}
+checkFactorsForSymbols.char <- function(Y){
+  if( is.character( Y ) ){
+   y <- str_trim( Y )
+   if( sum( grepl("/",y) )>0 ){ y <- str_replace_all(y, "\\/", ".") }
+   if( sum( grepl("\"",y) )>0 ){ y <- str_replace_all(y, "\"", ".") }
+   if( sum( grepl("..",y) )>0 ){ y <- str_replace_all(y, "\\.\\.", ".") }
+   if( sum( grepl("..",y) )>0 ){ y <- str_replace_all(y, "\\.\\.", ".") }
+   if( sum( grepl("+",y) )>0 ){ y <- str_replace_all(y, "\\+", "plus") }
+   if( sum( grepl("-",y) )>0 ){ y <- str_replace_all(y, "\\-", "minus") }
+   if( sum( grepl("*",y) )>0 ){ y <- str_replace_all(y, "\\*", "star") }
+   if( sum( grepl(":",y) )>0 ){ y <- str_replace_all(y, "\\:", "colon") }
+   if( sum( grepl("^",y) )>0 ){ y <- str_replace_all(y, "\\^", "hat") }
+   #if( sum( grepl("1",y) )>0 ){ y <- str_replace_all(y, "1",   "One") }
+   if( sum( grepl(">",y) )>0 ){ y <- str_replace_all(y, "\\>", "GT") }
+   if( sum( grepl("<",y) )>0 ){ y <- str_replace_all(y, "\\<", "LT") }
+   if( sum( grepl("=",y) )>0 ){ y <- str_replace_all(y, "\\=", "EQ") }
+   if( sum( grepl("~",y) )>0 ){ y <- str_replace_all(y, "\\~", "tilde") }
+   if( sum( grepl("?",y) )>0 ){ y <- str_replace_all(y, "\\?", "q") }
+   if( sum( grepl("|",y) )>0 ){ y <- str_replace_all(y, "\\|", "bar") }
+   if( sum( grepl("\\(",y) )>0 ){ y <- str_replace_all(y, "\\(", "_") }
+   if( sum( grepl("\\)",y) )>0 ){ y <- str_replace_all(y, "\\)", "_") }
+   out <- y
+  } else{ out <- Y }
+  return(out)
+ }
+
+```
+
+## Function Creat.dataList
+```{r function Creat.dataList, message=FALSE, warning=FALSE}
+  create.datList <- function(yList,xList,eda,pars){
+  library(colorRamps)
+  dat <- list()
+  dat$SUBJID <- as.character(eda$Merged[,eda$id_name])
+
+  if( !is.null(yList$Y) && (sum(is.na(yList$Y))<length(yList$Y)) ){
+   dat$Y <- yList$Y
+   dat$Y.lab <- yList$Y.lab
+   dat$Y.ordinal <- FALSE; if(is.factor(dat$Y)){ dat$Y.ordinal <- is.ordered(dat$Y) }
+   dat$Y.order.level <- yList$Y.order.level
+   if(!is.null(yList$Y.ttf.lab)){ dat$Y.ttf <- list()
+    for(i in 1:length(yList$Y.ttf.lab)){
+     dat$Y.ttf[[i]] <- cbind(eda$Y.ttf[,yList$Y.ttf.lab[i]], as.numeric(eda$Y.ttf.event[,yList$Y.ttf.event.lab[i]]) )
+   }}
+   dat$Y.ttf.lab <- yList$Y.ttf.lab
+   dat$Y.ttf.event.lab <- yList$Y.ttf.event.lab  
+   dat$Y.ttf.Tar <- yList$Y.ttf.Tar
+
+  } else{ 
+   if( is.null(yList$Y.ttf.lab) ){ stop("Error: Missing Y/Y.ttf prediction targets")
+   } else{
+    dat$Y <- cbind(eda$Y.ttf[,yList$Y.ttf.lab[1]], as.numeric(eda$Y.ttf.event[,yList$Y.ttf.event.lab[1]]) )
+    dat$Y.lab <- yList$Y.ttf.lab[1]
+    colnames( dat$Y ) <- c(paste0("Dur.",dat$Y.lab),paste0("Event.",dat$Y.lab))
+
+    dat$Y.ttf <- list()
+    for(i in 1:length(yList$Y.ttf.lab)){
+     dat$Y.ttf[[i]] <- cbind(eda$Y.ttf[,yList$Y.ttf.lab[i]], as.numeric(eda$Y.ttf.event[,yList$Y.ttf.event.lab[i]]) )
+    }
+    dat$Y.ttf.lab <- yList$Y.ttf.lab
+    dat$Y.ttf.event.lab <- yList$Y.ttf.event.lab  
+    dat$Y.ttf.Tar <- yList$Y.ttf.Tar
+   }
+  }
+ 
+  dat$Y2 <- yList$Y2
+
+  if( !is.null(xList$Unknown) ){ dat$Unknown <- as.data.frame( eda$Obs[,sort(xList$Unknown)] ) }		### Observables used for building predictive classifier ###
+  if( !is.null(xList$Known) ){ dat$Known <- as.data.frame( eda$Obs[,sort(xList$Known)] ) }
+  if( !is.null(xList$Trt) ){ dat$Trt <- eda$Obs[,xList$Trt]
+   dat$Trt.lab <- xList$Trt
+   dat$Trt.reflev <- xList$Trt.reflev
+   if(is.factor(dat$Trt)){ dat$Trt <- relevel(dat$Trt,ref=xList$Trt.reflev) }
+  }
+
+  if( is.factor(dat$Y) ){ 
+   dat$Y.levCol <- matlab.like(length(levels(dat$Y))) #c("#0000FF","#FF0000","#000000","#00FF00") #redgreen(64)
+  } else{ dat$Y.levCol <- greenred(pars$Y.Col.resolution) }
+  if( "#FFFFFF" %in% dat$Y.levCol ){ dat$Y.levCol[which(dat$Y.levCol=="#FFFFFF")] <- "#0000FF" }
+
+  dat$Y <- checkFactorsForSymbols(dat$Y)
+
+  if(!is.null(dat$Y2)){ for(i in 1:length(dat$Y2)){ 
+   dat$Y2[[i]] <- checkFactorsForSymbols(dat$Y2[[i]]) 
+  }}
+  if(!is.null(dat$Unknown)){ names(dat$Unknown) <- checkFactorsForSymbols.char(names(dat$Unknown)) }
+  if(!is.null(dat$Known)){ names(dat$Known) <- checkFactorsForSymbols.char(names(dat$Known)) }
+
+  ### remove non-unique predictors ###
+  if( !is.null(dat$Known) ){ w1 <- which( apply(dat$Known, MARGIN=2, FUN=function(x) length(unique( na.omit(x) ))==1 ) )
+   if( length(w1)>0 ){ dat$Known <- dat$Known[,-w1] } }
+
+  w2 <- which( apply(dat$Unknown, MARGIN=2, FUN=function(x) length(unique( na.omit(x) ))==1 ) )
+  if( length(w2)>0 ){ dat$Unknown <- dat$Unknown[,-w2] }
+
+  ### remove subjs with all missing X or Missing Trt ###
+  w1 <- which(rowSums(is.na(dat$Unknown))==ncol(dat$Unknown))
+  w2 <- NULL; if( !is.null(dat$Trt) ){ w2 <- which( is.na(dat$Trt) ) }
+  w <- unique(c(w1,w2))
+  if(length(w)>0){
+   dat$Unknown <- dat$Unknown[-w,]
+   dat$SUBJID <- dat$SUBJID[-w]
+   if( is.null(ncol(dat$Y)) ){ dat$Y <- dat$Y[-w] } else{ dat$Y <- dat$Y[-w,] }
+
+   if(!is.null(dat$Known)){  
+    if(ncol(as.data.frame(dat$Known))>1){
+     dat$Known <- dat$Known[-w,] 
+    } else{ dat$Known <- dat$Known[-w] } 
+   }
+   if(!is.null(dat$Y.ttf)){  
+    for(kk in 1:length(dat$Y.ttf)){ dat$Y.ttf[[kk]] <- dat$Y.ttf[[kk]][-w,] }
+   }
+   if(!is.null(dat$Y2)){ dat$Y2 <- as.data.frame(dat$Y2[-w,]) }
+   if( !is.null(dat$Trt) ){ dat$Trt <- dat$Trt[-w] }
+  }
+
+  ### split if missing Y ###
+  if( sum(is.na(dat$Y))>0 ){
+
+   ### create data set for missing Y for prediction only ###
+   if( is.null(ncol(dat$Y)) ){ u <- which( is.na(dat$Y) ) } else{ u <- which( rowSums( is.na(dat$Y) )==1 ) }
+   pred.dat <- list()
+   pred.dat$SUBJID <- dat$SUBJID[u]
+   if( is.null(ncol(dat$Y)) ){ pred.dat$Y <- dat$Y[u] } else{ pred.dat$Y <- dat$Y[u,] }
+   pred.dat$Unknown <- dat$Unknown[u,]
+   if( !is.null(dat$Known) ){ pred.dat$Known <- as.data.frame(dat$Known[u,])
+    names(pred.dat$Known) <- names(dat$Known)
+   } else{ pred.dat$Known <- NA }
+   if( !is.null(dat$Trt) ){ pred.dat$Trt <- dat$Trt[u] }
+   if( !is.null(dat$Y.ttf) ){ pred.dat$Y.ttf <- list(); for(i in 1:length(dat$Y.ttf) ){ pred.dat$Y.ttf[[i]] <- dat$Y.ttf[[i]][u,] } } else{ pred.dat$Y.ttf <- NA }
+   if( !is.null(dat$Y2) ){ pred.dat$Y2 <- as.data.frame(dat$Y2[u,])
+    names(pred.dat$Y2) <- names(dat$Y2)
+   } else{ pred.dat$Y2 <- NA }
+   pred.dat$Y.ttf.lab <- dat$Y.ttf.lab
+   Gen.Table1.for.predDat(pred.dat,pars)
+
+   if( !is.null(pred.dat$Y.ttf) ){ for(i in 1:length(pred.dat$Y.ttf) ){ colnames( pred.dat$Y.ttf[[i]] ) <- c(paste0("Dur.",pred.dat$Y.ttf.lab[i]),paste0("Event.",pred.dat$Y.ttf.lab[i])) } }
+
+   if( is.null(ncol(dat$Y)) ){ v <- which( !is.na(dat$Y) ) } else{ v <- which( rowSums( is.na(dat$Y) )==0 ) }
+   dat$SUBJID <- dat$SUBJID[v]
+   if( is.null(ncol(dat$Y)) ){ dat$Y <- dat$Y[v] } else{ dat$Y <- dat$Y[v,] }
+   dat$Unknown <- dat$Unknown[v,]
+   if( !is.null(dat$Known) ){ nam <- names(dat$Known); dat$Known <- as.data.frame(dat$Known[v,]); names(dat$Known) <- nam }
+   if( !is.null(dat$Trt) ){ dat$Trt <- dat$Trt[v] }
+   if( !is.null(dat$Y.ttf) ){ for(i in 1:length(dat$Y.ttf) ){ dat$Y.ttf[[i]] <- dat$Y.ttf[[i]][v,] } }
+   if( !is.null(dat$Y2) ){ nam <- names(dat$Y2); dat$Y2 <- as.data.frame(dat$Y2[v,]); names(dat$Y2) <- nam }
+
+  } else{ pred.dat <- NA }
+
+  dat$cohort <- rep("Train",nrow(dat$Unknown))
+  dat$cohort <- factor(dat$cohort)
+  dat$cohort.i <- list(1:nrow(dat$Unknown))
+  names(dat$cohort.i)[1] <- "Train"
+  names(dat$cohort.i[[1]]) <- dat$SUBJID
+
+  if( !is.null(dat$Y.ttf) ){ for(i in 1:length(dat$Y.ttf) ){ colnames( dat$Y.ttf[[i]] ) <- c(paste0("Dur.",dat$Y.ttf.lab[i]),paste0("Event.",dat$Y.ttf.lab[i])) } }
+
+  used <- c( eda$id_name, dat$Y.lab, names(dat$Unknown))
+  if( !is.null(dat$Known) ){ used <- c(used, names(dat$Known)) }
+  if( !is.null(dat$Trt.lab) ){ used <- c(used, dat$Trt.lab) }
+  if( !is.null(dat$Y2) ){ used <- c(used, names(dat$Y2)) }
+  if( !is.null(dat$Y.ttf) ){ used <- c(used, dat$Y.ttf.lab, dat$Y.ttf.event.lab) }
+  w1 <- setdiff( names(eda$Merged), unique( used ) )
+  if( length(w1)>0 ){ omit.dat <- list(SUBJID=eda$Merged[,eda$id_name], Obs=eda$Merged[,w1]) 
+  } else{ omit.dat <- NA }
+
+  saveRDS(list(fit.dat=dat, pred.dat=pred.dat, omit.dat=omit.dat), file.path(pars$output.path,"datList.RDS"))
+
+  return(list(fit.dat=dat, pred.dat=pred.dat, omit.dat=omit.dat))
+  }
+
+```
+
+## Function split.TestTrain 
+```{r function split.TestTrain, message=FALSE, warning=FALSE}
+split.TestTrain <- function(DAT, pars, Test.lab="Test", Tab1.lab=""){ set.seed(pars$seed)
+  
+  d <- DAT$fit.dat  # Subject ID's
+  d$cohort <- as.character(d$cohort)
+
+  ### test ids not given: select 1 test set from Train ###
+  if( is.null(d$Test.id) ){
+   w <- which( d$cohort=="Train" )
+
+   Tar.p <- length(d$SUBJID[w])*pars$prop.Test
+   obs.i <- 1:length(d$SUBJID[w])
+   S <- length(obs.i)-round(Tar.p)
+   Tr.i <- obs.i[ sort(sample(x=1:length(obs.i), size=S, replace=FALSE)) ]
+   Ts.i <- setdiff(obs.i, Tr.i )
+
+   d$cohort[Ts.i] <- Test.lab
+   d$cohort[Tr.i] <- "Train"
+   
+   d$cohort <- factor(d$cohort)
+   d$cohort.i <- list( Tr.i ); names(d$cohort.i)[1] <- "Train"; names(d$cohort.i[[1]]) <- d$SUBJID[Tr.i]
+   L <- levels(d$cohort)[-which(levels(d$cohort)=="Train")]
+   for(i in 1:length(L)){
+    d$cohort.i[[i+1]] <- which(d$cohort==L[i]); names(d$cohort.i)[i+1] <- L[i]; names(d$cohort.i[[i+1]]) <- d$SUBJID[d$cohort.i[[i+1]]]
+   }
+
+  } else{ 
+   ### test ids and labels given ###
+   if(!is.list(d$Test.id)){ d$Test.id <- list(d$Test.id) }
+
+   Ts.i <- list()
+   for(j in 1:length(d$Test.id)){
+    Ts.i[[j]] <- sort(unlist( sapply(X=d$Test.id[[j]], FUN=function(X,tar) which(tar==X), tar=d$SUBJID) ))
+    d$cohort[Ts.i[[j]]] <- d$Test.Lab[j]
+   }
+   d$cohort <- factor(d$cohort)
+   Tr.i <- sort(setdiff(1:length(d$SUBJID), unlist( Ts.i) ))
+   d$cohort.i <- list( Tr.i ); names(d$cohort.i)[1] <- "Train"; names(d$cohort.i[[1]]) <- d$SUBJID[Tr.i]
+   for(i in 1:length(Ts.i)){ d$cohort.i[[i+1]] <- Ts.i[[i]]; names(d$cohort.i)[i+1] <- d$Test.Lab[i] }
+  }
+
+  ## summarize association with split ##
+  U <- as.data.frame( list( y=d$Y, x=d$cohort ) )
+  Y.split.sum <- Y.ttf.split.sum <- NULL
+  if( is.null(ncol(d$Y)) ){
+   if(is.factor(U$y)){  Y.split.sum <- Ctab.2(U,cl.ORD=FALSE,Tab.labs=c("cohort",d$Y.lab))
+   } else{ names(U)[2] <- "g"
+    Y.split.sum <- Kruskal.2(U,cl.ORD=FALSE,Tab.labs=c("cohort",d$Y.lab))
+   }
+  }
+  if(!is.null(d$Y.ttf)){ Y.ttf.split.sum <- list()
+   y.lab <- d$Y.ttf.lab
+   for(i in 1:length(y.lab)){
+    KM <- survfit( Surv(d$Y.ttf[[i]][,1],d$Y.ttf[[i]][,2]) ~ d$cohort )
+    sdf <- survdiff( Surv(d$Y.ttf[[i]][,1],d$Y.ttf[[i]][,2]) ~ d$cohort, rho=0); p.val <- 1 - pchisq(sdf$chisq, length(sdf$n) - 1); Y.ttf.split.sum[[i]] <- sdf
+    dev.new()
+    plot(KM,main=paste0(y.lab[i],";  p-val=",round(p.val,5)), col=1:length(levels(d$cohort)), lwd=3, cex.axis=1.3, ylab="prop w/out event", xlab="duration"); legend("topright",levels(d$cohort),col=1:length(levels(d$cohort)),lwd=3)
+   }
+  }
+
+  for(i in 1:length(d$cohort.i)){
+   d[[names(d$cohort.i)[i]]] <- list( SUBJID=d$SUBJID[d$cohort.i[[i]]] )
+   if( is.null(ncol(d$Y)) ){ d[[names(d$cohort.i)[i]]]$Y <- d$Y[d$cohort.i[[i]]] } else{ d[[names(d$cohort.i)[i]]]$Y <- d$Y[d$cohort.i[[i]],]  }
+   d[[names(d$cohort.i)[i]]]$Y.lab <- d$Y.lab
+
+   if(!is.null(d$Y.ttf)){ d[[names(d$cohort.i)[i]]]$Y.ttf <- list()
+    for(k in 1:length(d$Y.ttf)){
+         d[[names(d$cohort.i)[i]]]$Y.ttf[[k]] <- d$Y.ttf[[k]][d$cohort.i[[i]],]
+    }; d[[names(d$cohort.i)[i]]]$Y.ttf.lab <- d$Y.ttf.lab
+   } else{ d[[names(d$cohort.i)[i]]]$Y.ttf <- d[[names(d$cohort.i)[i]]]$Y.ttf.lab <- NULL }
+
+   if(!is.null(d$Y2)){ d[[names(d$cohort.i)[i]]]$Y2 <- as.data.frame(d$Y2[d$cohort.i[[i]],])
+    names(d[[names(d$cohort.i)[i]]]$Y2) <- names(d$Y2)
+   } else{ d[[names(d$cohort.i)[i]]]$Y2 <- NULL }
+
+   if(!is.null(d$Unknown)){ d[[names(d$cohort.i)[i]]]$Unknown <- as.data.frame(d$Unknown[d$cohort.i[[i]],])
+    names(d[[names(d$cohort.i)[i]]]$Unknown) <- names(d$Unknown)
+   } else{ d[[names(d$cohort.i)[i]]]$Unknown <- NULL }
+
+   if(!is.null(d$Known)){ d[[names(d$cohort.i)[i]]]$Known <- as.data.frame(d$Known[d$cohort.i[[i]],])
+    names(d[[names(d$cohort.i)[i]]]$Known) <- names(d$Known)
+   } else{ d[[names(d$cohort.i)[i]]]$Known <- NULL }
+
+   if(!is.null(d$Trt)){ d[[names(d$cohort.i)[i]]]$Trt <- d$Trt[d$cohort.i[[i]]]
+   } else{ d[[names(d$cohort.i)[i]]]$Trt <- NULL }
+
+   Gen.Table1.by.cohort(d[[names(d$cohort.i)[i]]],pars,paste0(Tab1.lab,"-",names(d$cohort.i)[i]))
+  }
+
+  print("###### Test/Train Split Result #########")
+  if(!is.null(Y.split.sum)){ print(Y.split.sum) }
+  if(!is.null(Y.ttf.split.sum)){ print(Y.ttf.split.sum) }
+
+  saveRDS(list(fit.dat=d, pred.dat=DAT$pred.dat, omit.dat=DAT$omit.dat), file.path(pars$output.path,"datList.RDS"))
+
+  return(list(fit.dat=d, pred.dat=DAT$pred.dat, omit.dat=DAT$omit.dat))
+ }
+
+```
+
+## Function Gen.Table1.for.predDat
+```{r function Gen.Table1.for.predDat, message=FALSE, warning=FALSE}
+Gen.Table1.for.predDat <- function(d,pars,TabLab="-predOnly"){
+ #library(tableone)
+ Tab.1 <- list() #as.data.frame(rep(NA,nrow(d$Unknown)))
+ kh <- 1
+ Tab.1[[kh]] <- as.data.frame(rep(NA,nrow(d$Unknown))); names(Tab.1[[kh]]) <- d$Y.lab; kh <- kh+1
+ if(!is.null(d$Known)){ Tab.1[[kh]] <- as.data.frame(d$Known); names(Tab.1[[kh]]) <- names(d$Known); kh <- kh+1 }
+ if(!is.null(d$Trt)){ Tab.1[[kh]] <- as.data.frame(d$Trt); names(Tab.1[[kh]]) <- d$Trt.lab; kh <- kh+1 }
+ if(!is.null(d$Y.ttf)){ Tab.1[[kh]] <- as.data.frame(d$Y.ttf); Tab.1[[kh]] <- Tab.1[[kh]][,-seq(2,ncol(Tab.1[[kh]]),2)]
+                         names(Tab.1[[kh]]) <- d$Y.ttf.lab; kh <- kh+1
+  Tab.1[[kh]] <- as.data.frame(d$Y.ttf); Tab.1[[kh]] <- Tab.1[[kh]][,-seq(1,ncol(Tab.1[[kh]]),2)]
+                         names(Tab.1[[kh]]) <- paste0("Event.",d$Y.ttf.lab); kh <- kh+1
+ }
+ if(!is.null(d$Y2)){ Tab.1[[kh]] <- as.data.frame(d$Y2); names(Tab.1[[kh]]) <- names(d$Y2); kh <- kh+1 }
+ Tab.1[[kh]] <- as.data.frame(d$Unknown); names(Tab.1[[kh]]) <- colnames(d$Unknown)
+ Tab.1 <- as.data.frame(Tab.1)
+ names(Tab.1)
+
+ num.i <- sapply(1:ncol(Tab.1), function(j,D) is.numeric(D[,j]), D=Tab.1)
+ fac.i <- sapply(1:ncol(Tab.1), function(j,D) is.factor(D[,j]), D=Tab.1)
+
+ tableOne1.0 <- tableone::CreateTableOne(vars = names(Tab.1), test=FALSE, factorVars = names(Tab.1)[which(fac.i)], data = Tab.1, includeNA = FALSE)
+ tableOne2.0 <- tableone::CreateTableOne(vars = names(Tab.1), test=FALSE, factorVars = names(Tab.1)[which(fac.i)], data = Tab.1, includeNA = TRUE)
+
+ X <- list()
+
+ X1.0=print(tableOne1.0, quote = FALSE, noSpaces = TRUE, showAllLevels = TRUE, minMax = TRUE, nonnormal = names(Tab.1)[which(num.i)]) # package tableone
+  Variables=row.names(X1.0); Variables[1]="Total Sample Size"; X[[1]] <- data.frame(Variables,X1.0)
+ X2.0=print(tableOne2.0, quote = FALSE, noSpaces = TRUE, showAllLevels = TRUE, minMax = TRUE, nonnormal = names(Tab.1)[which(num.i)]) # package tableone
+  Variables=row.names(X2.0); Variables[1]="Total Sample Size"; X[[2]] <- data.frame(Variables,X2.0)
+ X.nam <- c("marginal","marginal.w.NA")
+
+ k <- 3
+ if(!is.null(d$Y)){
+  if( is.factor(Tab.1[,d$Y.lab]) ){
+   tableOne1 <- tableone::CreateTableOne(vars = names(Tab.1), strata=d$Y.lab, test=FALSE, factorVars = names(Tab.1)[which(fac.i)], data = Tab.1, includeNA = FALSE)
+    X1=print(tableOne1, quote = FALSE, noSpaces = TRUE, showAllLevels = TRUE, minMax = TRUE, nonnormal = names(Tab.1)[which(num.i)]) # package tableone
+    Variables=row.names(X1); Variables[1]="Total Sample Size"; X[[k]] <- data.frame(Variables,X1); k <- k+1
+    X.nam <- c(X.nam, paste0("by-",d$Y.lab) )
+
+   tableOne2 <- tableone::CreateTableOne(vars = names(Tab.1), strata=d$Y.lab, test=FALSE, factorVars = names(Tab.1)[which(fac.i)], data = Tab.1, includeNA = TRUE)
+    X2=print(tableOne2, quote = FALSE, noSpaces = TRUE, showAllLevels = TRUE, minMax = TRUE, nonnormal = names(Tab.1)[which(num.i)]) # package tableone
+    Variables=row.names(X2); Variables[1]="Total Sample Size"; X[[k]] <- data.frame(Variables,X2); k <- k+1
+    X.nam <- c(X.nam, paste0("by-",d$Y.lab,".w.NA") )
+ }}
+
+ if( "package:rJava" %in% search() ){
+  xlsx::write.xlsx(X[[1]], file=file.path(pars$output.path,paste0("Table-1",TabLab,".xlsx")), sheetName=X.nam[1], row.names=FALSE ); AP=TRUE
+  for(j in 2:length(X)){ 
+   xlsx::write.xlsx(X[[j]], file=file.path(pars$output.path,paste0("Table-1",TabLab,".xlsx")), append=AP, sheetName=X.nam[j], row.names=FALSE ) #, col.names=FALSE, row.names=FALSE); AP=TRUE
+  }
+ }
+}
+
+```
+
+## Function Gen.Table1.by.cohort
+```{r function Gen.Table1.by.cohort, message=FALSE, warning=FALSE}
+Gen.Table1.by.cohort <- function(d,pars,TabLab=""){
+ #library(tableone)
+ Tab.1 <- list() #as.data.frame(rep(NA,nrow(d$Obs)))
+ kh <- 1
+ if(!is.null(d$Y)){ 
+  if( is.null(ncol(d$Y)) || ncol(d$Y)==1 ){ Tab.1[[kh]] <- as.data.frame(d$Y); names(Tab.1[[kh]]) <- d$Y.lab; kh <- kh+1 
+  } else{ Tab.1[[kh]] <- as.data.frame(d$Y[,1]); names(Tab.1[[kh]]) <- paste0(d$Y.lab,".follow-up"); kh <- kh+1 }
+ }
+ if(!is.null(d$Known)){ Tab.1[[kh]] <- as.data.frame(d$Known); names(Tab.1[[kh]]) <- names(d$Known); kh <- kh+1 }
+ if(!is.null(d$Trt)){ Tab.1[[kh]] <- as.data.frame(d$Trt); names(Tab.1[[kh]]) <- d$Trt.lab; kh <- kh+1 }
+ if(!is.null(d$Y.ttf)){ Tab.1[[kh]] <- as.data.frame(d$Y.ttf); Tab.1[[kh]] <- Tab.1[[kh]][,-seq(2,ncol(Tab.1[[kh]]),2)]
+                         names(Tab.1[[kh]]) <- d$Y.ttf.lab; kh <- kh+1
+  Tab.1[[kh]] <- as.data.frame(d$Y.ttf); Tab.1[[kh]] <- Tab.1[[kh]][,-seq(1,ncol(Tab.1[[kh]]),2)]
+                         names(Tab.1[[kh]]) <- paste0("Event.",d$Y.ttf.lab); kh <- kh+1
+ }
+ if(!is.null(d$Y2)){ Tab.1[[kh]] <- as.data.frame(d$Y2); names(Tab.1[[kh]]) <- names(d$Y2); kh <- kh+1 }
+ Tab.1[[kh]] <- as.data.frame(d$Unknown); names(Tab.1[[kh]]) <- colnames(d$Unknown)
+ Tab.1 <- as.data.frame(Tab.1)
+ names(Tab.1)
+
+ num.i <- sapply(1:ncol(Tab.1), function(j,D) is.numeric(D[,j]), D=Tab.1)
+ fac.i <- sapply(1:ncol(Tab.1), function(j,D) is.factor(D[,j]), D=Tab.1)
+
+ tableOne1.0 <- tableone::CreateTableOne(vars = names(Tab.1), test=FALSE, factorVars = names(Tab.1)[which(fac.i)], data = Tab.1, includeNA = FALSE)
+ tableOne2.0 <- tableone::CreateTableOne(vars = names(Tab.1), test=FALSE, factorVars = names(Tab.1)[which(fac.i)], data = Tab.1, includeNA = TRUE)
+
+ X <- list()
+
+ X1.0=print(tableOne1.0, quote = FALSE, noSpaces = TRUE, showAllLevels = TRUE, minMax = TRUE, nonnormal = names(Tab.1)[which(num.i)]) # package tableone
+  Variables=row.names(X1.0); Variables[1]="Total Sample Size"; X[[1]] <- data.frame(Variables,X1.0)
+ X2.0=print(tableOne2.0, quote = FALSE, noSpaces = TRUE, showAllLevels = TRUE, minMax = TRUE, nonnormal = names(Tab.1)[which(num.i)]) # package tableone
+  Variables=row.names(X2.0); Variables[1]="Total Sample Size"; X[[2]] <- data.frame(Variables,X2.0)
+ X.nam <- c("marginal","marginal.w.NA")
+
+ k <- 3
+ if(!is.null(d$Y)){
+  if( is.factor(Tab.1[,d$Y.lab]) ){
+   tableOne1 <- tableone::CreateTableOne(vars = names(Tab.1), strata=d$Y.lab, test=FALSE, factorVars = names(Tab.1)[which(fac.i)], data = Tab.1, includeNA = FALSE)
+    X1=print(tableOne1, quote = FALSE, noSpaces = TRUE, showAllLevels = TRUE, minMax = TRUE, nonnormal = names(Tab.1)[which(num.i)]) # package tableone
+    Variables=row.names(X1); Variables[1]="Total Sample Size"; X[[k]] <- data.frame(Variables,X1); k <- k+1
+    X.nam <- c(X.nam, paste0("by-",d$Y.lab) )
+
+   tableOne2 <- tableone::CreateTableOne(vars = names(Tab.1), strata=d$Y.lab, test=FALSE, factorVars = names(Tab.1)[which(fac.i)], data = Tab.1, includeNA = TRUE)
+    X2=print(tableOne2, quote = FALSE, noSpaces = TRUE, showAllLevels = TRUE, minMax = TRUE, nonnormal = names(Tab.1)[which(num.i)]) # package tableone
+    Variables=row.names(X2); Variables[1]="Total Sample Size"; X[[k]] <- data.frame(Variables,X2); k <- k+1
+    X.nam <- c(X.nam, paste0("by-",d$Y.lab,".w.NA") )
+ }}
+
+ if( "package:rJava" %in% search() ){
+  xlsx::write.xlsx(X[[1]],  file=file.path(pars$output.path,paste0("Table-1",TabLab,".xlsx")), sheetName=X.nam[1], row.names=FALSE ); AP=TRUE
+  for(j in 2:length(X)){ 
+   xlsx::write.xlsx(X[[j]], file=file.path(pars$output.path,paste0("Table-1",TabLab,".xlsx")), append=AP, sheetName=X.nam[j], row.names=FALSE ) #, col.names=FALSE, row.names=FALSE); AP=TRUE
+  }
+ }
+}
+
+```
+
+## Function split.Kfolds
+```{r function split.Kfolds, message=FALSE, warning=FALSE}
+split.Kfolds <- function(DAT, pars){ set.seed(pars$seed)
+  d <- DAT$fit.dat
+  d$Kfolds <- ""
+
+  Tar.p <- rep( round(length(d$SUBJID)/pars$split.Kfolds), pars$split.Kfolds-1)
+  Tar.p <- c(Tar.p, length(d$SUBJID)-sum(Tar.p) )
+  o <- sample(x=1:length(d$SUBJID), size=length(d$SUBJID), replace=FALSE)
+  s <- 0
+  for(i in 1:length(Tar.p)){
+   d$Kfolds[ o[ (s+1):(s+Tar.p[i]) ] ] <- paste0("Fold.",i)
+   s <- s + Tar.p[i]
+  }
+  d$Kfolds <- factor(d$Kfolds)
+
+  ## summarize association with split ##
+  Y.split.sum <- Y.ttf.split.sum <- NULL
+  if( is.null(ncol(d$Y)) ){
+   U <- as.data.frame( list( y=d$Y, x=d$Kfolds ) )
+   if(is.factor(U$y)){  Y.split.sum <- Ctab.2(U,cl.ORD=FALSE,Tab.labs=c("Kfolds",d$Y.lab))
+   } else{ names(U)[2] <- "g"
+    Y.split.sum <- Kruskal.2(U,cl.ORD=FALSE,Tab.labs=c("Kfolds",d$Y.lab))
+   }
+  }
+  if(!is.null(d$Y.ttf)){ Y.ttf.split.sum <- list()
+   y.lab <- d$Y.ttf.lab
+   for(i in 1:length(y.lab)){
+    KM <- survfit( Surv(d$Y.ttf[[i]][,1],d$Y.ttf[[i]][,2]) ~ d$Kfolds )
+    sdf <- survdiff( Surv(d$Y.ttf[[i]][,1],d$Y.ttf[[i]][,2]) ~ d$Kfolds, rho=0); p.val <- 1 - pchisq(sdf$chisq, length(sdf$n) - 1); Y.ttf.split.sum[[i]] <- sdf
+    dev.new()
+    plot(KM,main=paste0(y.lab[i],";  p-val=",round(p.val,5)), col=1:length(levels(d$Kfolds)), lwd=3, cex.axis=1.3, ylab="prop w/out event", xlab="duration"); legend("topright",levels(d$Kfolds),col=1:length(levels(d$Kfolds)),lwd=3)
+   }
+  }
+
+  print("###### Kfolds Split Result #########")
+  if(!is.null(Y.split.sum)){ print(Y.split.sum) }
+  if(!is.null(Y.ttf.split.sum)){ print(Y.ttf.split.sum) }
+
+  saveRDS(list(fit.dat=d, pred.dat=DAT$pred.dat, omit.dat=DAT$omit.dat), file.path(pars$output.path,"datList.RDS"))
+
+  return(list(fit.dat=d, pred.dat=DAT$pred.dat, omit.dat=DAT$omit.dat))
+ }
+
+```
+
+# Creating Data List
+## Define Data List
+### Factor or Numeric Level or NULL for TTF
+```{r factor or numeric, message=FALSE, warning=FALSE}
+Sversion <- 1
+install.libs <- FALSE
+# util_dir <- "D:/GI-Ming/000 CWRU Statistical Analyst/Projects/009 Survival Analysis for CCF/Utils"
+# dir.lab <- "DataList"
+# source(file.path(util_dir,paste0("DL-initiate",Sversion,".R")))
+eda$Y.ttf.event <- eda$Y.ttf.event[,c(2,1,3)]
+View(result.eda$X.select.mat)
+ yList <- list()
+ head(eda$Y)
+ 
+ 
+ yList$Y <- eda$Y[,"response"]            ### Prediction Target factor or numeric (nominal, ordinal, or continous) or NULL if TTF used as Y
+ yList$Y.lab <- "response"                ### Y var label
+ yList$Y.order.level <- "Responder"       ### For sorting subtypes
+ #yList$Y <- factor(yList$Y, ordered=FALSE) or as.ordered()
+ yList$Y2 <- as.data.frame(list(objresponse=eda$Y[,"objresponse"], maxtumorpcchg=eda$Obs$maxtumorpcchg))	### List: Additional response or covariate data for association analysis (numeric or factor)
+ 
+```
+ 
+### TTF response variables
+```{r ttf response variables, message=FALSE, warning=FALSE}
+ yList$Y.ttf.lab <- names(eda$Y.ttf)[3:1]
+ yList$Y.ttf.lab 
+ yList$Y.ttf.event.lab <- names(eda$Y.ttf.event)[3:1]
+ yList$Y.ttf.event.lab
+ yList$Y.ttf.Tar <- list( 80, 2000, 2000)    ### Targets duration for individual Time-to-Failure Prediction
+ yList$Y.ttf.Tar
+ 
+```
+
+## Create Data List
+```{r create data list, message=FALSE, warning=FALSE}
+ xList <- list()  ### Labels Only ###
+ xList$Unknown <- sort(c(paste0("biomarker_",1:6),paste0("demo_",1:3)))	### Observables used for interrogating predictive classifier
+ xList$Unknown
+ xList$Known <- sort(c(paste0("clinic_",1:4),     ### Observables known to be associated with outcomes (usually clinical prog) ###
+                              "bltumorsize")) 
+ xList$Known
+ xList$Trt <- "trt"  					  ### Intervention Variable: Factor-level ###
+ xList$Trt.reflev <- "A"
+ 
+ pars$output.path <- "D:/GI-Ming/000 CWRU Statistical Analyst/Projects/014 Survival Functions for CCF Data List/Output"
+ # pars$output.path <- "E:/CWRU Projects/009 Survival Analysis for CCF/Output"
+ 
+ pars$output.path <- file.path(pars$output.path,ifelse( !is.null(yList$Y.lab),yList$Y.lab,"Y"))
+dir.create(pars$output.path)
+datList <- create.datList(yList,xList,eda,pars)
+
+str(datList) 
+
+```
+
+## Validat Data List
+### Split Test and Train
+```{r split test and train, message=FALSE, warning=FALSE}
+# datList <- split.TestTrain(datList, pars)  ### No ids ###
+# An error occurs at line 230, for S <- length(obs.i)-round(Tar.p) is numeric(0)
+
+```
+
+### K-folds defined
+```{r  K-folds defined, message=FALSE, warning=FALSE}
+ # datList <- split.Kfolds(datList, pars)
+ # An error occurs
+
+ # save.image(file.path(pars$output.path,"dataList.RData"))
+
+```
+
+
+# Creating Survival Functions
+## Function Follow-Up Summary
+```{r Summary of Event/Censor Time, message=FALSE, warning=FALSE}
+followup.summary <- function(datList,m){
+# install.packages('pander')
+library(skimr)
+library(dplyr)
+library(tidyverse)
+library(pander)
+
+# datList$fit.dat$Y.ttf[[1]] is matrix of Time and Event for OS
+# datList$fit.dat$Y.ttf[[2]] is matrix of Time and Event for DM
+# datList$fit.dat$Y.ttf[[3]] is matrix of Time and Event for LR
+# datList$fit.dat$Trt is Treatment (A/B)
+
+# Convert matrix to dataframe and remove NA
+for (i in 1:m)  
+{
+  datList$fit.dat$Y.ttf[[i]]<-data.frame(datList$fit.dat$Y.ttf[[i]])
+  datList$fit.dat$Y.ttf[[i]]<- datList$fit.dat$Y.ttf[[i]] %>%
+      filter(complete.cases(.))
+  names(datList$fit.dat$Y.ttf[[i]])<-c("time","recur") # Simplify column names
+}
+
+# Count the number of subjects by event
+output<-"D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#01 Survival Estimate/01 Follow-Up Summary.txt"
+
+sink(output, append=FALSE, split=FALSE, type = "output")   
+    # direct output to a file
+    # The append option controls whether output overwrites or adds to a file. 
+    # The split option determines if output is also sent to the screen as well as the output file.
+cat("\n")
+cat("Counts of recurrence (0/1) by events \n")
+cat("\n")
+cat("Note: The event of Death is considered as 'recurrence', even though death is not a case of recurrence \n")
+cat("\n")
+for (i in 1:m) 
+ {
+  cat(paste0(datList$fit.dat$Y.ttf.event.lab[i]))
+  # pander(table(datList$fit.dat$Y.ttf[[i]][2]))
+  print(table(datList$fit.dat$Y.ttf[[i]][2])) # Column 2 is for recurrence (0 or 1)
+  cat("\n") 
+ }
+
+# Summary of time by event
+cat("\n")
+cat("Statistical summary of Time stratified by Recurrence (0/1) \n")
+cat("\n")
+for (i in 1:m)
+{
+ Event <- datList$fit.dat$Y.ttf[[i]]
+ cat("\n")
+ cat(paste0(datList$fit.dat$Y.ttf.lab[i]), "\n") # Indicate the label of event
+ print(by(Event$time, Event$recur, summary)) # We must print it because automatic printing of functions is turned off in a loop.
+ cat("\n") 
+}
+
+sink() # return output to the terminal
+return(datList) # Returing datList of complete cases
+}
+
+```
+
+## Function Survival Object
+```{r Building a survival object, message=FALSE, warning=FALSE}
+survival.object <- function(datList,m) {
+library(survival)
+dfsurv<-list()
+output<-"D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#01 Survival Estimate/02 Survival Object.txt"
+sink(output, append=FALSE, split=FALSE, type = "output")
+cat("\n\n")
+
+for (i in 1:m) 
+{
+  df <- datList$fit.dat$Y.ttf[[i]]
+  dfsurv[[i]] <- Surv(time = df$time, event = df$recur)   # Time means time of follow-up
+  cat(paste0(datList$fit.dat$Y.ttf.lab[i]), "\n") # Indicate the label
+  print(dfsurv[[i]])
+  cat("\n")
+}
+sink()
+return(dfsurv)
+}
+
+```
+
+## Function K-M Survival Summary
+```{r Creating K-M survival estimate, message=FALSE, warning=FALSE}
+KM.survival.summary<-function(datList,m, dfsurv) {
+dffit<-list()
+output<-"D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#01 Survival Estimate/03 K-M Survival Summary.txt"
+sink(output, append=FALSE, split=FALSE, type = "output")
+cat("\n\n")
+
+for (i in 1:m) 
+{
+ dffit[[i]] <- survfit(dfsurv[[i]] ~ 1,  data=datList$fit.dat$Y.ttf[[i]])
+ cat(paste0(datList$fit.dat$Y.ttf.lab[i]), "\n") # Indicate the label
+ print(dffit[[i]], print.rmean=TRUE)
+ cat("\n")
+}
+sink()
+return(dffit)
+}
+
+```
+
+## Function K-M Survival List
+```{r Listing K-M survival estimate, message=FALSE, warning=FALSE}
+KM.survival.list<-function(datList, m, dffit){
+km.list<-list()
+output<-"D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#01 Survival Estimate/04 K-M Survival List.txt"
+sink(output, append=FALSE, split=FALSE, type = "output")
+cat("\n\n")
+
+for (i in 1:m) 
+{
+  cat(paste0(datList$fit.dat$Y.ttf.lab[i]), "\n") # Indicate the label of event
+  km.list[[i]]<-summary(dffit[[i]])
+  print(km.list[[i]])
+  cat("\n")
+}
+sink()
+return(km.list)
+}
+
+```
+
+## Function K-M Survival Curve (I)
+```{r K-M Survival Curve plot, message=FALSE, warning=FALSE}
+KM.survival.curve.1<-function(datList, m, dffit) {
+# Call the pdf command to start the plot
+pdf(file = "D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#01 Survival Estimate/05 K-M Survival Curve (I).pdf",
+    width = 7, # The width of the plot in inches
+    height = 7) # The height of the plot in inches
+
+for (i in 1:m)
+ {
+  plot(dffit[[i]], 
+       ylab="Survival probability", 
+       xlab="Time of Follow-Up",
+       main=paste0("Kaplan-Meier Plot for ", datList$fit.dat$Y.ttf.lab[i]))
+}
+
+# Run dev.off() to create the file
+dev.off()
+
+}
+
+```
+
+## Function K-M Survival Curve (II)
+```{r K-M Survival Curve ggsurvplot, message=FALSE, warning=FALSE}
+KM.survival.curve.2<-function(datList, m){
+library(survminer)
+# library(readxl)
+# library(dplyr)
+# library(ggplot2)
+  
+# Call the pdf command to start the plot
+pdf(file = "D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#01 Survival Estimate/06 K-M Survival Curve (II).pdf",
+    width = 7, # The width of the plot in inches
+    height = 7) # The height of the plot in inches
+
+test<-list()
+for (i in 1:m)
+{
+  d<-data.frame(datList$fit.dat$Y.ttf[[i]])
+  names(d)<-c("time", "recur")
+  Trt<-datList$fit.dat$Trt
+  d<-cbind(Trt, d) # Treatment factor is added to data list, even though it won't used in this function 
+  d <- d %>% filter(complete.cases(.))
+  dsurv <- Surv(time = d$time, event = d$recur)
+  dfit <- survfit(dsurv ~ 1, data=d)
+  test[[i]] <- d
+  print(ggsurvplot(dfit, # Print(ggsurvplot()) will be neeeded for output , for in a loop the automatic output is turned off 
+             data = d,
+             conf.int = TRUE, # Add confidence interval
+             # surv.plot.height = 10,
+             risk.table = TRUE, # Add risk table
+             risk.table.height = .30,
+             xlab = "Time of Follow-Up", # Add X axis label
+             title = paste0("Kaplan-Meier Plot for ", datList$fit.dat$Y.ttf.lab[i])))
+}
+dev.off() # Run dev.off() to create the file
+return(test)
+}
+
+```
+
+## Function Inverse K-M Hazard Estimate
+```{r Inverse K-M Hazard Estimates, message=FALSE, warning=FALSE}
+# The Inverse Kaplan-Meier estimator of H(t)
+Inverse.KM.Hazard.Estiamte<-function(datList, m, dffit) {
+output<-"D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#02 Hazard Estimate/07 Inverse K-M Hazard Estimate.txt"
+sink(output, append=FALSE, split=FALSE, type = "output")
+cat("\n\n")
+
+haz.list<-list()
+for (i in 1:m) 
+ {
+  # d <- data.frame(test[[i]])
+  # dsurv <- Surv(time = d$time, event = d$recur)
+  #dfit <- survfit(dsurv ~ 1, data=d) # With no stratification
+  dfit<-dffit[[i]]
+  H_est <- -log(dfit$surv) # Cummulative Hazard
+  H_est <- c(H_est, tail(H_est, 1)) 
+  haz <- data_frame(time = c(dfit$time, tail(dfit$time, 1)), inverse_KM = H_est)
+  names(haz) <- c(datList$fit.dat$Y.ttf.lab[i], "Inverse K-M Cumulative Hazard") # Indicate the label
+  haz<-round(haz,4)
+  pander(print(haz)) # Pander makes the output more presentable
+  cat("\n")
+  haz.list[[i]]<-haz
+}
+  sink() # return output to the terminal
+  return(haz.list)
+}
+
+```
+
+## Function Inverse K-M Hazard Plot
+```{r Inverse K-M Cumulative Hazard plot, message=FALSE, warning=FALSE}
+# The Hazard plot of inverse Kaplan-Meier estimate
+Inverse.KM.Hazard.Plot<-function(datList, m, haz.list) {
+pdf(file = "D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#02 Hazard Estimate/08 Inverse K-M Hazard Plot.pdf",
+    width = 7, # The width of the plot in inches
+    height = 7) # The height of the plot in inches
+
+for (i in 1:m) 
+ {
+  haz<-haz.list[[i]]
+  names(haz)<-c("Time", "Inverse_KM")
+  print(ggplot(haz, aes(x = Time, y = Inverse_KM)) +
+    geom_step() +
+    labs(x = "Time of Follow-Up", y = "Cumulative Hazard", title = paste0("Cumulative Hazard Function via Inverse K-M for ", datList$fit.dat$Y.ttf.lab[i])))
+}
+  dev.off() # Run dev.off() to create the file
+} 
+
+```
+
+## Function Inverse K-M Plus N-A Hazard Estimate
+```{r N-A Hazard Estimates added, message=FALSE, warning=FALSE}
+# The Nelson-Aalen estimator of H(t) added to Inverser K-M
+Inverse.KM.Plus.NA.Hazard.Estimate<-function(datList, m, dffit, haz.list) {
+output<-"D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#02 Hazard Estimate/09 Inverse K-M Plus N-A Hazard Estimate.txt"
+sink(output, append=FALSE, split=FALSE, type = "output")
+cat("\n\n")
+
+haz.list.1<-list()
+for (i in 1:m) 
+ {
+  dfit<-dffit[[i]]
+  h_NA <- dfit$n.event / dfit$n.risk
+  H_NA <- cumsum(h_NA)
+  H_NA <- c(H_NA, tail(H_NA, 1))
+  
+  haz<-haz.list[[i]]
+  haz.1<-cbind(haz, H_NA)
+  names(haz.1) <- c(datList$fit.dat$Y.ttf.lab[i], "Inverse K-M Cum. Hazard", "Nelson_Aalen Cum. Hazard") # Indicate the label of event
+  haz.1<-round(haz.1,4)
+  pander(print(haz.1))
+  cat("\n")
+  haz.list.1[[i]]<-haz.1
+}
+sink() # return output to the terminal
+return(haz.list.1)
+}
+
+```
+
+## Function Inverse K-M Plus N-A Hazard Plot
+```{r N-A Cumulative Hazard Plot, message=FALSE, warning=FALSE}
+Inverse.KM.Plus.NA.Hazard.Plot<-function(datList, m, haz.list.1) {
+pdf(file = "D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#02 Hazard Estimate/10 Inverse K-M Plus N-A Hazard Plot.pdf",
+    width = 7, # The width of the plot in inches
+    height = 7) # The height of the plot in inches
+
+  for (i in 1:m) 
+ {
+  haz<-haz.list.1[[i]] 
+  names(haz)<-c("Time", "Inverse_KM", "Nelson_Aalen")
+  haz_comp <- gather(haz, key = "Method", value = "Hazard.est", Inverse_KM:Nelson_Aalen)
+  print(ggplot(haz_comp, aes(x = Time, y = Hazard.est, col = Method)) +
+    geom_step() + 
+    labs(x = "Time of Follow-Up", y = "Cumulative Hazard", title = paste0( "Cumulative Hazard Function for ", datList$fit.dat$Y.ttf.lab[i]))) +
+  theme_bw() 
+  
+  }
+  dev.off() # Run dev.off() to create the file
+}
+
+```
+
+## Function Stratified K-M Survival Summary 
+```{r stratified Kaplan-Meier Survival summary, message=FALSE, warning=FALSE}
+Stratified.KM.Survival.Summary<-function(datList, test, m) {
+output<-"D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#03 Stratified Survival Estimate/11 Stratified K-M Survival Summary.txt"
+sink(output, append=FALSE, split=FALSE, type = "output")
+cat("\n\n")
+
+dffit<-list()
+for (i in 1:m)
+{
+  d <- data.frame(test[[i]])
+  dsurv <- Surv(time = d$time, event = d$recur)
+  dfit <- survfit(dsurv ~ d$Trt, data=d)
+  cat(paste0(datList$fit.dat$Y.ttf.lab[i]), "\n") # Indicate the label of event
+  print(dfit, print.rmean=TRUE)
+  cat("\n")
+  dffit[[i]]<-dfit
+}
+sink() # return output to the terminal
+return(dffit)  
+}
+
+```
+
+## Function Stratified Comprehensive Survival Analysis
+```{r stratified comprehensive Survival analysis, message=FALSE, warning=FALSE}
+Stratified.Comprehensive.Survival.Analysis<-function(datList, test, m) {
+output<-"D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#03 Stratified Survival Estimate/12-1 Stratified Comprehensive Survival Analysis (part 1).txt"
+sink(output, append=FALSE, split=FALSE, type = "output")
+cat("\n\n")
+
+# install package "survivalAnalysis"
+library(survivalAnalysis)
+for (i in 1:m)
+{
+  d <- data.frame(test[[i]])
+  cat(paste0(datList$fit.dat$Y.ttf.lab[i]), "\n") # Indicate the label of event
+  analyse_survival(d,vars(time, recur), by=Trt) %>% print
+  cat("\n")
+}
+sink() # return output to the terminal
+}
+
+```
+
+## Function Stratified K-M Survival List 
+```{r stratified Kaplan-Meier Survival list , message=FALSE, warning=FALSE}
+Stratified.KM.Survival.List<-function(datList, m, dffit) {
+output<-"D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#03 Stratified Survival Estimate/13 Stratified K-M Survival List.txt"
+sink(output, append=FALSE, split=FALSE, type = "output")
+cat("\n\n")
+
+stratified.km.list<-list()
+  for (i in 1:m)
+{
+  cat(paste0(datList$fit.dat$Y.ttf.lab[i]), "\n") # Indicate the label of event
+  print(summary(dffit[[i]]))
+  stratified.km.list[[i]]<-summary(dffit[[i]])
+  cat("\n")
+  }
+ sink() # return output to the terminal
+ return(stratified.km.list)
+}
+
+```
+
+## Function Stratified K-M Curve (I)
+```{r stratified K-M Survival Curves plot, message=FALSE, warning=FALSE}
+Stratified.KM.Curve.1<-function(datList, m, dffit) {
+pdf(file = "D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#03 Stratified Survival Estimate/14 Stratified K-M Curve (I).pdf",
+    width = 7, # The width of the plot in inches
+    height = 7) # The height of the plot in inches
+
+for (i in 1:m) 
+{
+  plot(dffit[[i]],
+     main=paste0("Kaplan-Meier Curve by Treatment for ",datList$fit.dat$Y.ttf.lab[i]),
+     ylab="Survival Probability",
+     xlab="Time of Follow-Up",
+     col=c("red", "blue"),
+     lty=c(1,2))
+legend(5,.4, 
+      legend=c("Treatment A", "Treatment B"),
+      text.col=c("red", "blue"),
+      col=c("red", "blue"),
+      lty=c(1,2),
+      bty="n")
+}
+  dev.off() # Run dev.off() to create the file
+}
+
+```
+
+## Function Stratified K-M Curve (II)
+```{r stratified K-M Survival Curves ggsurvplot, message=FALSE, warning=FALSE}
+Stratified.KM.Curve.2<-function(datList, m) {
+# Using ggsurvplot function
+# library(survminer)
+# library(ggplot2)
+pdf(file = "D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#03 Stratified Survival Estimate/15 Stratified K-M Curve (II).pdf",
+    width = 7, # The width of the plot in inches
+    height = 7) # The height of the plot in inches
+for (i in 1:m) 
+{
+  d<-data.frame(datList$fit.dat$Y.ttf[[i]]) 
+    # datList here is the raw data list with no deletion of missing data.
+    # If data list of complete cases is used, an unsolvable error of mismatch of row numbers (200, 199) will occur.
+  names(d)<-c("time", "recur")
+  Trt<-datList$fit.dat$Trt
+  d<-cbind(Trt, d) 
+  # d <- data.frame(test[[i]])
+  dsurv <- Surv(time = d$time, event = d$recur)
+  dfit <- survfit(dsurv ~ d$Trt, data=d)
+  print(ggsurvplot(dfit,
+             data = d,
+             palette = c("red", "blue"), # custom colors 
+             pval = TRUE,
+             conf.int = TRUE,
+             xlab = "Time of Follow-Up",
+             legend.labs = c("Treatment A", "Treatment B"),
+             risk.table = TRUE,
+             risk.table.height = 0.35,
+             title = paste0("Kaplan-Meier Plot by Treatment for ", datList$fit.dat$Y.ttf.lab[i])))
+
+}
+  dev.off() # Run dev.off() to create the file
+}
+
+```
+
+## Function Log-Rank Test
+```{r log rank test, message=FALSE, warning=FALSE}
+Log.Rank.Test<-function(datList, test, m) {
+output<-"D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#03 Stratified Survival Estimate/16 Log-Rank Test.txt"
+sink(output, append=FALSE, split=FALSE, type = "output")
+cat("\n\n")
+
+for (i in 1:m) 
+{
+  d <- data.frame(test[[i]])
+  dsurv <- Surv(time = d$time, event = d$recur)
+  cat(paste0(datList$fit.dat$Y.ttf.lab[i]), "\n") # Indicate the label
+  print(survdiff(dsurv ~ d$Trt))
+  cat("\n")
+}
+sink() # return output to the terminal
+}
+
+```
+
+## Function Simple Cox Summary (I)
+```{r fitting cox model with treatment with coxph, message=FALSE, warning=FALSE}
+Simple.Cox.Summary.1<-function(datList, test, m) {
+# Fitting cox model by treatment with coxph
+output<-"D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#04 Simple Cox Regression/17 Simple Cox Summary (I).txt"
+sink(output, append=FALSE, split=FALSE, type = "output")
+cat("\n\n") 
+
+for (i in 1:m)
+ {
+   d <- data.frame(test[[i]])
+   cfit <- with(d, coxph(Surv(time, recur) ~ Trt)) 
+   cat(paste0(datList$fit.dat$Y.ttf.lab[i]), "\n") # Indicate the label of event
+  print(summary(cfit))
+   cat("\n")
+   
+}
+sink() # return output to the terminal
+}
+
+```
+
+## Function Simple Cox Summary (II)
+```{r Fitting Cox Model with Treatment with cph, message=FALSE, warning=FALSE}
+# Fitting cox model by treatment with cph
+Simple.Cox.Summary.2<-function(datList, test, m) {
+library(rms)
+output<-"D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#04 Simple Cox Regression/18 Simple Cox Summary (II).txt"
+sink(output, append=FALSE, split=FALSE, type = "output")
+cat("\n\n") 
+
+for (i in 1:m)
+ {
+   d <- data.frame(test[[i]])
+   # units(d$time) <- "time"
+   dist <- datadist(d) # Distribution summaries for predictor variables
+   options(datadist = "dist")
+   dsurv <- Surv(time = d$time, event = d$recur)
+   model_d <- cph(dsurv ~ Trt, data = d,
+                  x = TRUE,
+                  y = TRUE,
+                  surv = TRUE) 
+   cat(paste0(datList$fit.dat$Y.ttf.lab[i]), "\n") # Indicate the label of event
+   print(model_d)
+   cat("\n")
+
+}
+sink() # return output to the terminal
+}
+
+```
+
+## Function Baseline Survival Plot (I)
+```{r baseline survival plot of simple model with coxph, message=FALSE, warning=FALSE}
+Baseline.Survival.Plot.1<-function(datList, test, m) {
+# Baseline survival plot of simple model with coxph
+pdf(file = "D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#04 Simple Cox Regression/19 Baseline Simple Cox Survival Plot (I).pdf",
+    width = 7, # The width of the plot in inches
+    height = 7) # The height of the plot in inches
+
+for (i in 1:m)
+ {
+   d <- data.frame(test[[i]])
+   cfit <- with(d, coxph(Surv(time, recur) ~ Trt)) 
+   plot(survfit(cfit), 
+        xlab = "Time of Follow_Up",
+        ylab = "Survival Probability",
+        main = paste0("Baseline Survival of Simple Cox with coxph for ", datList$fit.dat$Y.ttf.lab[i]))
+
+}
+  dev.off() # Run dev.off() to create the file
+}
+
+```
+
+## Function Baseline Survival Plot (II)
+```{r baseline survival plot of simple model with cph, message=FALSE, warning=FALSE}
+Baseline.Survival.Plot.2<-function(datList, test, m) {
+# Baseline survival plot of simple model with cph
+pdf(file = "D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#04 Simple Cox Regression/20 Baseline Simple Cox Survival Plot (II).pdf",
+    width = 7, # The width of the plot in inches
+    height = 7) # The height of the plot in inches
+
+  for (i in 1:m)
+ {
+   d <- data.frame(test[[i]])
+   # units(d$time) <- "time"
+   dist <- datadist(d) # Distribution summaries for predictor variables
+   options(datadist = "dist")
+   dsurv <- Surv(time = d$time, event = d$recur)
+   model_d <- cph(dsurv ~ Trt, data = d,
+                  x = TRUE,
+                  y = TRUE,
+                  surv = TRUE) 
+   plot(survfit(model_d), 
+        xlab = "Time of Follow_Up",
+        ylab = "Survival Probability",
+        main = paste0("Baseline Survival of Simple Cox with cph for ", datList$fit.dat$Y.ttf.lab[i]))
+
+  }
+  dev.off() # Run dev.off() to create the file
+}
+
+```
+
+## Function Baseline Hazard Plot (I)
+```{r Baseline Cumulative Hazard Plot of Simple Model with coxph, message=FALSE, warning=FALSE}
+Baseline.Hazard.Plot.1<-function(datList, test, m) {
+# Baseline Cumulative Hazard Plot of Simple Model with coxph
+pdf(file = "D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#04 Simple Cox Regression/21 Baseline Simple Cox Hazard Plot (I).pdf",
+    width = 7, # The width of the plot in inches
+    height = 7) # The height of the plot in inches
+  
+for (i in 1:m)
+ {
+   d <- data.frame(test[[i]])
+   cfit <- with(d, coxph(Surv(time, recur) ~ Trt))
+   plot(survfit(cfit), 
+     col=c("blue", "black", "black"),
+     fun="cumhaz",
+     ylab="Cumulative Hazard", xlab="Time of Follow-Up",
+    main = paste0("Baseline Hazard of Simple Cox with coxph for ", datList$fit.dat$Y.ttf.lab[i]))
+}
+  dev.off() # Run dev.off() to crea
+}
+
+```
+
+## Function Baseline Hazard Plot (II)
+```{r Baseline Cumulative Hazard Plot of Simple Model with cph, message=FALSE, warning=FALSE}
+Baseline.Hazard.Plot.2<-function(datList, test, m) {
+# Baseline Cumulative Hazard Plot of Simple Model with cph
+pdf(file = "D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#04 Simple Cox Regression/22 Baseline Simple Cox Hazard Plot (II).pdf",
+    width = 7, # The width of the plot in inches
+    height = 7) # The height of the plot in inches
+  
+for (i in 1:m)
+ {
+   d <- data.frame(test[[i]])
+   # units(d$time) <- "time"
+   dist <- datadist(d) # Distribution summaries for predictor variables
+   options(datadist = "dist")
+   dsurv <- Surv(time = d$time, event = d$recur)
+   model_d <- cph(dsurv ~ Trt, data = d,
+                  x = TRUE,
+                  y = TRUE,
+                  surv = TRUE) 
+   plot(survfit(model_d), 
+     col=c("blue", "black", "black"),
+     fun="cumhaz",
+     ylab="Cumulative Hazard", xlab="Time of Follow-Up",
+    main = paste0("Baseline Hazard of Simple Cox with cph for ", datList$fit.dat$Y.ttf.lab[i]))
+}
+  dev.off() # Run dev.off() to crea
+}
+
+```
+
+## Function Simple Cox Survival Plot (I)
+```{r survival plot by treatment with coxph, message=FALSE, warning=FALSE}
+Simple.Cox.Survival.Plot.1<-function(datList, test, m) {
+# Survival plot by treatment with coxph.
+pdf(file = "D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#04 Simple Cox Regression/23 Stratified Simple Cox Survival Plot (I).pdf",
+    width = 7, # The width of the plot in inches
+    height = 7) # The height of the plot in inches
+for (i in 1:m)
+ {
+   d <- data.frame(test[[i]])
+   cfit <- with(d, coxph(Surv(time, recur) ~ Trt)) 
+   newdat <- with(d, data.frame(Treatment = c(0, 1) ))
+   # c(0,1) is only for stratification purpose and has no impact on the relation with trt level.
+   plot(survfit(cfit, newdata = newdat),
+                conf.int = TRUE,
+                col = c("blue", "red"), # For coxph, switch the order from "c("red" ,"blue") of K-M survival curve 
+                xlab = "Time of Follow-Up",
+                ylab = "Survival Probability",
+                main = paste0("Survival Plot with coxph for ", datList$fit.dat$Y.ttf.lab[i])) 
+   legend(0.5, 0.2,
+          legend=c("Treatment A", "Treatment B"),
+          # Color for Trt A is set as red to match K-M survival curve.
+          # Color for Trt B is set as blue to match K-M survival curve.
+          lty = 1,
+          col = c("red", "blue"),
+          text.col = c("red", "blue"))
+}
+   dev.off() # Run dev.off() to crea
+}
+
+```
+
+## Function Simple Cox Survival Plot (II)
+```{r survival plot by treatment with cph, message=FALSE, warning=FALSE}
+Simple.Cox.Survival.Plot.2<-function(datList, test, m) {
+# Survival plot by treatment with cph.
+library(rms)
+pdf(file = "D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#04 Simple Cox Regression/24 Stratified Simple Cox Survival Plot (II).pdf",
+    width = 7, # The width of the plot in inches
+    height = 7) # The height of the plot in inches
+
+for (i in 1:m)
+ {
+   d <- data.frame(test[[i]])
+   dist <- datadist(d) # Distribution summaries for predictor variables
+   options(datadist = "dist")
+   dsurv <- Surv(time = d$time, event = d$recur)
+   model_d <- cph(dsurv ~ Trt, data = d,
+                  x = TRUE,
+                  y = TRUE,
+                  surv = TRUE) 
+  survplot(model_d, # No need to add "print"" function for survplot in loop.
+         Trt, # It does not matter if trt is added here
+         lty = c(1,2),
+         n.risk=TRUE,
+         # time.inc=1,
+         col=c("red", "blue"),
+         xlab=paste0("Time of Follow-Up for ", datList$fit.dat$Y.ttf.lab[i], " with cph")) # "Main" does not work for ading title.
+  
+}
+dev.off() # Run dev.off() to crea  
+}
+
+```
+
+## Function Simple Cox Hazard Plot
+```{r Cumulative Hazard Plot by Treatment with coxph, message=FALSE, warning=FALSE}
+Simple.Cox.Hazard.Plot<-function(datList, test, m) {
+# Cumulative Hazard Plot by Treatment with coxph.
+pdf(file = "D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#04 Simple Cox Regression/25 Stratified Simple Cox Hazard Plot.pdf",
+    width = 7, # The width of the plot in inches
+    height = 7) # The height of the plot in inches
+  
+for (i in 1:m)
+ {
+   d <- data.frame(test[[i]])
+   cfit <- with(d, coxph(Surv(time, recur) ~ Trt)) 
+   newdat <- with(d, data.frame(Treatment = c(0,1)))
+  plot(survfit(cfit, newdata = newdat),
+                fun="cumhaz",        
+                conf.int = TRUE,
+                # col = c("red", "blue"),
+                col = c("blue", "red"), # For coxph, switch the order from "c("red" ,"blue") of K-M survival curve 
+                xlab = "Time of Follow-Up",
+                ylab = "Cumulative Hazard",
+                main = paste0("Cumulative Hazard with coxph for ", datList$fit.dat$Y.ttf.lab[i])) 
+   legend(0.5, 0.3,
+          legend=c("Treatment A", "Treatment B"),
+          lty = 1,
+          col = c("red", "blue"),
+          text.col = c("red", "blue"))
+}
+  dev.off() # Run dev.off() to crea  
+}
+
+```
+
+## Function Simple Cox HR Effect
+```{r Hazard Ratio Effect of Treatment with cph, message=FALSE, warning=FALSE}
+Simple.Cox.HR.Effect<-function(datList, test, m) {
+# Hazard Ratio Effect of Treatment with cph
+output<-"D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#04 Simple Cox Regression/26 Simple Cox Hazard Ratio Effect.txt"
+sink(output, append=FALSE, split=FALSE, type = "output")
+cat("\n\n")  
+
+for (i in 1:m)
+ {
+   d <- data.frame(test[[i]])
+   d$Trt <- as.numeric(factor(d$Trt))
+   dist <- datadist(d) # Distribution summaries for predictor variables
+   options(datadist = "dist")
+   dsurv <- Surv(time = d$time, event = d$recur)
+   model_d <- cph(dsurv ~ Trt, data = d,
+                  x = TRUE,
+                  y = TRUE,
+                  surv = TRUE) 
+   cat(paste0(datList$fit.dat$Y.ttf.lab[i]), "\n") # Indicate the label of event
+   cat("Trt A:B \n")
+  pander(summary(model_d))
+  cat("\n")
+
+}
+sink() # return output to the terminal
+}
+
+```
+
+## Function Simple Cox PH Test Result (I)
+```{r Testing of Proportional Hazards of simple model with coxph, message=FALSE, warning=FALSE}
+Simple.Cox.Diagnostics.Result.1<-function(datList, test, m) {
+# P-values of testing Proportional Hazard assumption of simple Cox on coxph
+output<-"D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#05 Simple Cox Diagnostics/27 Simple Cox Proportional Hazard Test Result (I).txt"
+sink(output, append=FALSE, split=FALSE, type = "output")
+cat("\n\n")    
+
+for (i in 1:m)
+ {
+   d <- data.frame(test[[i]])
+   cfit <- with(d, coxph(Surv(time, recur) ~ Trt)) 
+   cat(paste0("Proportional Hazard Test of Simple Cox on coxph for ", datList$fit.dat$Y.ttf.lab[i]), "\n")
+   print(cox.zph(cfit, transform="km", global=TRUE))
+   cat("\n")
+}
+sink() # return output to the terminal
+}
+
+```
+
+## Function Simple Cox PH Test Plot (I)
+```{r Plot of Testing of Proportional Hazards of simple model with coxph, message=FALSE, warning=FALSE}
+Simple.Cox.Diagnostics.Plot.1<-function(datList, test, m) {
+# Plotting the PH test results on coxph
+pdf(file = "D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#05 Simple Cox Diagnostics/28 Simple Cox Proportional Hazard Test Plot (I).pdf",
+    width = 7, # The width of the plot in inches
+    height = 7) # The height of the plot in inches
+
+for (i in 1:m)
+ {
+   d <- data.frame(test[[i]])
+   cfit <- with(d, coxph(Surv(time, recur) ~ Trt)) 
+   plot(cox.zph(cfit, transform="km", global=TRUE), 
+        main=paste0("Proportional Hazard Test of Simple Cox on coxph for ", datList$fit.dat$Y.ttf.lab[i]))
+}
+  dev.off() # Run dev.off() to create the file
+}
+
+```
+
+## Function Simple Cox PH Test Result (II)
+```{r Testing of Proportional Hazards of simple model with cph, message=FALSE, warning=FALSE}
+Simple.Cox.Diagnostics.Result.2<-function(datList, test, m) {
+# P-values of testing Proportional Hazard assumption of simple Cox on cph
+output<-"D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#05 Simple Cox Diagnostics/29 Simple Cox Proportional Hazard Test Result (II).txt"
+sink(output, append=FALSE, split=FALSE, type = "output")
+cat("\n\n")
+
+for (i in 1:m)
+ {
+   d <- data.frame(test[[i]])
+   dist <- datadist(d) # Distribution summaries for predictor variables
+   options(datadist = "dist")
+   dsurv <- Surv(time = d$time, event = d$recur)
+   model_d <- cph(dsurv ~ Trt, data = d,
+                  x = TRUE,
+                  y = TRUE,
+                  surv = TRUE) 
+   cat(paste0("Proportional Hazard Test of Simple Cox on cph for ", datList$fit.dat$Y.ttf.lab[i]),"\n")
+   print(cox.zph(model_d, transform="km"))
+   cat("\n")
+}
+sink() # return output to the terminal
+}
+
+```
+  
+## Function Simple Cox PH Test Plot (II)
+```{r Plot of Testing of Proportional Hazards of simple model with cph, message=FALSE, warning=FALSE}
+Simple.Cox.Diagnostics.Plot.2<-function(datList, test, m) {
+# Plotting the PH test results on cph
+pdf(file = "D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#05 Simple Cox Diagnostics/30 Simple Cox Proportional Hazard Test Plot (II).pdf",
+    width = 7, # The width of the plot in inches
+    height = 7) # The height of the plot in inches
+
+for (i in 1:m)
+ {
+   d <- data.frame(test[[i]])
+   dist <- datadist(d) # Distribution summaries for predictor variables
+   options(datadist = "dist")
+   dsurv <- Surv(time = d$time, event = d$recur)
+   model_d <- cph(dsurv ~ Trt, data = d,
+                  x = TRUE,
+                  y = TRUE,
+                  surv = TRUE) 
+    plot(cox.zph(model_d, "identity"),
+         main=paste0("Proportional Hazard Test of Simple Cox on cph for ", datList$fit.dat$Y.ttf.lab[i]))
+ }
+ dev.off() # Run dev.off() to create the file 
+}
+
+```
+
+## Function Simple Cox Influential Cases (I)
+```{r Checking influential cases of simple model with coxph, message=FALSE, warning=FALSE}
+Simple.Cox.Influential.Cases.1<-function(datList, test, m) {
+# Checking influential cases of Cox model with coxph
+pdf(file = "D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#05 Simple Cox Diagnostics/31 Simple Cox Influential Cases (I).pdf",
+    width = 7, # The width of the plot in inches
+    height = 7) # The height of the plot in inches
+
+for (i in 1:m)
+ {
+  d <- data.frame(test[[i]])
+  cfit <- with(d, coxph(Surv(time, recur) ~ Trt)) 
+  dfbeta <- residuals(cfit, type="dfbeta") # type=dfbeta produces the estimated changes in the coefficients divided by their standard errors.
+  plot(dfbeta,
+       ylab=names(coef(cfit)),
+       main=paste0("Checking influential cases of Simple Cox on coxph for ", datList$fit.dat$Y.ttf.lab[i]))
+  abline(h=0, lty=2)
+
+}
+  dev.off() # Run dev.off() to create the file
+}
+
+```
+
+## Function Simple Cox Influential Cases (II)
+```{r Checking influential cases of simple model with cph, message=FALSE, warning=FALSE}
+Simple.Cox.Influential.Cases.2<-function(datList, test, m) {
+# Checking influential cases of Cox model with cph
+pdf(file = "D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#05 Simple Cox Diagnostics/32 Simple Cox Influential Cases (II).pdf",
+    width = 7, # The width of the plot in inches
+    height = 7) # The height of the plot in inches
+
+for (i in 1:m)
+ {
+  d <- data.frame(test[[i]])
+  dist <- datadist(d) # Distribution summaries for predictor variables
+  options(datadist = "dist")
+  dsurv <- Surv(time = d$time, event = d$recur)
+  cfit <- with(d, coxph(Surv(time, recur) ~ Trt)) # For the purpose of pooling predictor's name only
+  model_d <- cph(dsurv ~ Trt, data = d,
+                  x = TRUE,
+                  y = TRUE,
+                  surv = TRUE) 
+  dfbeta <- residuals(model_d, type="dfbeta") # type=dfbetas produces the estimated changes in the coefficients divided by their standard errors.
+  plot(dfbeta,
+       ylab=names(coef(cfit)),
+       main=paste0("Checking influential cases of Simple Cox on cph for ", datList$fit.dat$Y.ttf.lab[i]))
+  abline(h=0, lty=2)
+
+}
+  dev.off() # Run dev.off() to create the file
+}
+
+```
+
+## Function Simple Cox Validation
+```{r validating cph summaries of simple model, message=FALSE, warning=FALSE}
+Simple.Cox.Validation<-function(datList, test, m) {
+# Resampling validation of Cox model with cph
+output<-"D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#05 Simple Cox Diagnostics/33 Simple Cox Validation.txt"
+sink(output, append=FALSE, split=FALSE, type = "output")
+cat("\n\n")
+
+for (i in 1:m)
+ {
+   d <- data.frame(test[[i]])
+   dist <- datadist(d) # Distribution summaries for predictor variables
+   options(datadist = "dist")
+   dsurv <- Surv(time = d$time, event = d$recur)
+   model_d <- cph(dsurv ~ Trt, data = d,
+                  x = TRUE,
+                  y = TRUE,
+                  surv = TRUE) 
+   cat(paste0(datList$fit.dat$Y.ttf.lab[i]), "\n") # Indicate the label of event
+   set.seed(43201)
+   print(validate(model_d, B=100)) # B is the number of repetitions.
+  cat("\n")
+}
+sink() # return output to the terminal
+}
+
+```
+
+## Function Tableone Summary
+```{r tableone summary by treatment, message=FALSE, warning=FALSE}
+Tableone.Summary<-function(datList){
+# Tableone summary by treatment
+library(tableone)
+# closeAllConnections() # Return the output to the console
+output<-"D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#06 Multivariable Cox Regression/34 Tableone Summary.txt"
+sink(output, append=FALSE, split=FALSE, type = "output")
+cat("\n\n")
+
+biomarker_1<-data.frame(as.numeric(datList$fit.dat$Unknown$biomarker_1))
+biomarker_2<-data.frame(as.numeric(datList$fit.dat$Unknown$biomarker_2))
+biomarker_3<-data.frame(as.numeric(datList$fit.dat$Unknown$biomarker_3))
+biomarker_4<-data.frame(as.numeric(datList$fit.dat$Unknown$biomarker_4))
+biomarker_5<-data.frame(as.numeric(datList$fit.dat$Unknown$biomarker_5))
+biomarker_6<-as.numeric(datList$fit.dat$Unknown$biomarker_6)
+demo_1<-data.frame(datList$fit.dat$Unknown$demo_1)
+demo_2<-data.frame(datList$fit.dat$Unknown$demo_2)
+demo_3<-data.frame(datList$fit.dat$Unknown$demo_3)
+clinic_1<-data.frame(datList$fit.dat$Known$clinic_1)
+clinic_2<-data.frame(datList$fit.dat$Known$clinic_2)
+clinic_3<-data.frame(datList$fit.dat$Known$clinic_3)
+clinic_4<-data.frame(datList$fit.dat$Known$clinic_4)
+Trt<-data.frame(datList$fit.dat$Trt)
+
+time<-list() # For time 
+event<-list() # For event
+for (i in 1:3) {
+time[[i]]<-data.frame(as.numeric(datList$fit.dat$Y.ttf[[i]][,1])) 
+event[[i]]<-data.frame(as.numeric(datList$fit.dat$Y.ttf[[i]][,2]))
+}
+
+data<-cbind(Trt, demo_1, demo_2, demo_3, clinic_1, clinic_2, clinic_3, clinic_4, biomarker_1, biomarker_2, biomarker_3, biomarker_4, biomarker_5, biomarker_6, time[[1]], time[[2]], time[[3]], event[[1]], event[[2]], event[[3]]) 
+
+names(data)<-c("Trt", "demo_1", "demo_2", "demo_3", "clinic_1", "clinic_2", "clinic_3", "clinic_4", "biomarker_1", "biomarker_2", "biomarker_3", "biomarker_4", "biomarker_5", "biomarker_6", datList$fit.dat$Y.ttf.lab[1], datList$fit.dat$Y.ttf.lab[2], datList$fit.dat$Y.ttf.lab[3], datList$fit.dat$Y.ttf.event.lab[1], datList$fit.dat$Y.ttf.event.lab[2], datList$fit.dat$Y.ttf.event.lab[3])
+
+vars <-c("demo_1", "demo_2", "demo_3", "clinic_1", "clinic_2", "clinic_3", "clinic_4", "biomarker_1", "biomarker_2", "biomarker_3", "biomarker_4", "biomarker_5", "biomarker_6")
+factorVars <- c("demo_1", "demo_2", "clinic_2", "clinic_3", "clinic_4")
+table1 <- CreateTableOne(data = data, vars = vars, factorVars = factorVars, strata = c("Trt"))
+print(table1)
+cat("\n\n")
+print(summary(table1))
+sink()
+return(data)
+}
+
+```
+
+## Function MV Cox Summary (I)
+```{r Fitting Cox Model with Covariates by coxph, message=FALSE, warning=FALSE}
+MV.Cox.Summary.1<-function(datList, data, m) {
+# Preparing data list for multivariable Cox model of coxph
+output<-"D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#06 Multivariable Cox Regression/35 Multivariable Cox Summary (I).txt"
+sink(output, append=FALSE, split=FALSE, type = "output")
+cat("\n\n")
+
+mvars <-c("Trt", "demo_1", "demo_2", "demo_3", "clinic_1", "clinic_2", "clinic_3", "clinic_4")
+mdata <- dplyr::select(data, mvars)
+mdata$Trt<-as.factor(mdata$Trt)
+mtest <- list()
+mtest[[1]]<-dplyr::select(data, Time_to_Death, OS_Event)
+mtest[[2]]<-dplyr::select(data, Time_to_DM, DM_Event)
+mtest[[3]]<-dplyr::select(data, Time_to_LR, LR_Event)
+
+for (i in 1:m) 
+ {
+  names(mtest[[i]])<-c("time", "recur") 
+  mtest[[i]] <- cbind(mdata, mtest[[i]])
+  mtest[[i]] <- mtest[[i]] %>%
+   filter(complete.cases(.))
+}
+
+# for (i in 2:m) {mtest[[i]]$time<-as.numeric(mtest[[i]]$time) }
+
+# Fitting multivariable Cox model of coxph
+for (i in 1:m)
+ {
+   d <- data.frame(mtest[[i]])
+   cfit <- with(d, coxph(Surv(time, recur) ~ Trt+demo_1+ demo_2+ demo_3+clinic_1+clinic_2+clinic_3+clinic_4))
+   cat(paste0(datList$fit.dat$Y.ttf.lab[i]), "\n") # Indicate the label.
+   print(summary(cfit))
+   cat("\n")
+   
+}
+sink()
+return(mtest)
+}
+
+```
+
+## Function MV Cox Summary (II)
+```{r Fitting Cox Model with Covariates by cph, message=FALSE, warning=FALSE}
+MV.Cox.Summary.2<-function(datList, mtest, m) {
+# Fitting multivariable Cox model of cph
+output<-"D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#06 Multivariable Cox Regression/36 Multivariable Cox Summary (II).txt"
+sink(output, append=FALSE, split=FALSE, type = "output")
+cat("\n\n")
+
+library(rms)
+for (i in 1:m)
+ {
+   d <- data.frame(mtest[[i]])
+   dist <- datadist(d) # Distribution summaries for predictor variables
+   options(datadist = "dist")
+   dsurv <- Surv(time = d$time, event = d$recur)
+   model_d <- cph(dsurv ~ Trt+demo_1+ demo_2+ demo_3+clinic_1+clinic_2+clinic_3+clinic_4,
+                  data = d,
+                  x = TRUE,
+                  y = TRUE,
+                  surv = TRUE) 
+   cat(paste0(datList$fit.dat$Y.ttf.lab[i]), "\n") # Indicate the label of event
+   print(model_d)
+   cat("\n")
+
+}
+sink()
+}
+
+```
+
+## Function Comprehensive Multivariable Cox Analysis
+```{r Comprehensive Multivariable Cox analysis, message=FALSE, warning=FALSE}
+Comprehensive.MV.Cox.Analysis<-function(datList, mtest, m) {
+output<-"D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#06 Multivariable Cox Regression/37 Comprehensive Multivariable Cox Analysis.txt"
+sink(output, append=FALSE, split=FALSE, type = "output")
+cat("\n\n")
+
+# The comprehensive multivaraible Cox analysis is not saved to txt but printed to the screen and copied/pasted to Excel file.
+
+for (i in 1:m)
+ {
+   d <- data.frame(mtest[[i]])
+   cat(paste0(datList$fit.dat$Y.ttf.lab[i]), "\n") # Indicate the label of event
+   analyse_multivariate(d,vars(time, recur), vars(Trt, demo_1, demo_2,  demo_3, clinic_1, clinic_2, clinic_3, clinic_4)) %>%
+   print()
+   cat("\n")
+}
+ sink()
+}
+
+```
+
+## Function MV Cox Survival Plot (I)
+```{r Survival Plot of Multivariable Model with coxph, message=FALSE, warning=FALSE}
+MV.Cox.Survival.Plot.1<-function(datList, mtest, m) {
+# Survival Plot of Multivariable Model with coxph.
+pdf(file = "D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#06 Multivariable Cox Regression/38 Multivariable Cox Survival Plot (I).pdf",
+    width = 7, # The width of the plot in inches
+    height = 7) # The height of the plot in inches
+
+for (i in 1:m)
+ {
+   d <- data.frame(mtest[[i]])
+   cfit <- with(d, coxph(Surv(time, recur) ~ Trt+demo_1+ demo_2+ demo_3+clinic_1+clinic_2+clinic_3+clinic_4))
+   plot(survfit(cfit),
+        xlab = "Time of Follow_Up",
+        ylab = "Survival Probability",
+        main = paste0("Survival Probability of MV Cox Model with coxph for ", datList$fit.dat$Y.ttf.lab[i]))
+
+}
+  dev.off() # Run dev.off() to create the file
+}
+
+```
+
+## Function MV Cox Survival Plot (II)
+```{r Survival Plot of Multivariable Model with cph, message=FALSE, warning=FALSE}
+MV.Cox.Survival.Plot.2<-function(datList, mtest, m) {
+# Survival Plot of Multivariable Model with cph.
+pdf(file = "D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#06 Multivariable Cox Regression/39 Multivariable Cox Survival Plot (II).pdf",
+    width = 7, # The width of the plot in inches
+    height = 7) # The height of the plot in inches
+  
+for (i in 1:m)
+ {
+   d <- data.frame(mtest[[i]])
+   dist <- datadist(d) # Distribution summaries for predictor variables
+   options(datadist = "dist")
+   dsurv <- Surv(time = d$time, event = d$recur)
+   model_d <- cph(dsurv ~ Trt+demo_1+ demo_2+ demo_3+clinic_1+clinic_2+clinic_3+clinic_4,
+                  data = d,
+                  x = TRUE,
+                  y = TRUE,
+                  surv = TRUE) 
+   plot(survfit(model_d),
+        xlab = "Time of Follow_Up",
+        ylab = "Survival Probability",
+        main = paste0("Survival Probability of MV Cox Model with cph for ", datList$fit.dat$Y.ttf.lab[i]))
+
+}
+  dev.off() # Run dev.off() to create the file
+}
+
+```
+
+## Function MV Cox Hazard Plot (I)
+```{r Cumulative Hazard Plot of Multivariate Model with coxph, message=FALSE, warning=FALSE}
+MV.Cox.Hazard.Plot.1<-function(datList, mtest, m) {
+# Cumulative Hazard Plot of Multivariate Model with coxph
+pdf(file = "D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#06 Multivariable Cox Regression/40 Multivariable Cox Hazard Plot (I).pdf",
+    width = 7, # The width of the plot in inches
+    height = 7) # The height of the plot in inches
+  
+for (i in 1:m)
+ {
+   d <- data.frame(mtest[[i]])
+   cfit <- with(d, coxph(Surv(time, recur) ~ Trt+demo_1+ demo_2+ demo_3+clinic_1+clinic_2+clinic_3+clinic_4))
+  plot(survfit(cfit), 
+     col=c("blue", "black", "black"),
+     fun="cumhaz",
+     ylab="Cumulative Hazard", xlab="Time of Follow-Up",
+     main = paste0("Cumulative Hazard of MV Cox Model with coxph for ", datList$fit.dat$Y.ttf.lab[i]))
+}
+  dev.off() # Run dev.off() to create the file
+}
+
+```
+
+## Function MV Cox Hazard Plot (II)
+```{r Cumulative Hazard Plot of Multivariate Model with cph, message=FALSE, warning=FALSE}
+MV.Cox.Hazard.Plot.2<-function(datList, mtest, m) {
+# Cumulative Hazard Plot of Multivariate Model with cph
+pdf(file = "D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#06 Multivariable Cox Regression/41 Multivariable Cox Hazard Plot (II).pdf",
+    width = 7, # The width of the plot in inches
+    height = 7) # The height of the plot in inches
+  
+for (i in 1:m)
+ {
+   d <- data.frame(mtest[[i]])
+   dist <- datadist(d) # Distribution summaries for predictor variables
+   options(datadist = "dist")
+   dsurv <- Surv(time = d$time, event = d$recur)
+   model_d <- cph(dsurv ~ Trt+demo_1+ demo_2+ demo_3+clinic_1+clinic_2+clinic_3+clinic_4,
+                  data = d,
+                  x = TRUE,
+                  y = TRUE,
+                  surv = TRUE) 
+  plot(survfit(model_d), 
+     col=c("blue", "black", "black"),
+     fun="cumhaz",
+     ylab="Cumulative Hazard", xlab="Time of Follow-Up",
+     main = paste0("Cumulative Hazard of MV Cox Model with cph for ", datList$fit.dat$Y.ttf.lab[i]))
+}
+  dev.off() # Run dev.off() to create the file
+}
+
+```
+
+## Function MV Cox HR Effect 
+```{r Hazard Ratio Effect of Multivariable Model with cph, message=FALSE, warning=FALSE}
+MV.Cox.HR.Effect<-function(datList, mtest, m) {
+# Hazard Ratio Effect of Multivariable Model with cph
+output<-"D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#06 Multivariable Cox Regression/42 Multivariable Cox Hazard Ratio Effect.txt"
+sink(output, append=FALSE, split=FALSE, type = "output")
+cat("\n\n")
+
+for (i in 1:m)
+ {
+   d <- data.frame(mtest[[i]])
+   d$Trt <- as.numeric(factor(d$Trt))-1
+   # To estimate treatment effect for cph, tretment (trt) should be numerical.
+   # as.numeric makes A/B become 1/2
+   # as.numeric-1 will make A/B become 0/1
+   dist <- datadist(d) # Distribution summaries for predictor variables
+   options(datadist = "dist")
+   dsurv <- Surv(time = d$time, event = d$recur)
+   model_d <- cph(dsurv ~ Trt+demo_1+ demo_2+ demo_3+clinic_1+clinic_2+clinic_3+clinic_4,
+                  data = d,
+                  x = TRUE,
+                  y = TRUE,
+                  surv = TRUE) 
+   cat(paste0(datList$fit.dat$Y.ttf.lab[i]), "\n") # Indicate the label of event
+   cat("trt A=0, trt B=1\n")
+  print(summary(model_d))
+  cat("\n")
+
+}
+sink()
+}
+
+```
+
+## Function MV Cox PH Test Result (I)
+```{r Testing of Proportional Hazards of Multivariable Model with coxph, message=FALSE, warning=FALSE}
+MV.Cox.PH.Test.Result.1<-function(datList, mtest, m) {
+# P-values of Proportionality Assumption Test of MV Cox on coxph
+output<-"D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#07 Multivariable Cox Diagnostics/43 Multivariable Cox Proportional Hazard Test Result (I).txt"
+sink(output, append=FALSE, split=FALSE, type = "output")
+cat("\n\n")
+
+for (i in 1:m)
+ {
+   d <- data.frame(mtest[[i]])
+   cfit <- with(d, coxph(Surv(time, recur) ~ Trt+demo_1+ demo_2+ demo_3+clinic_1+clinic_2+clinic_3+clinic_4))
+   cat(paste0("PH Test of MV Cox on coxph for ", datList$fit.dat$Y.ttf.lab[i]), "\n")
+   print(cox.zph(cfit, transform="km", global=TRUE))
+   cat("\n")
+}
+sink()
+}
+
+```
+
+## Function MV Cox PH Test Plot (I)
+```{r Plot of Testing Proportional Hazards of Multivariable Model with coxph, message=FALSE, warning=FALSE}
+MV.Cox.PH.Test.Plot.1<-function(datList, mtest, m) {
+# Plotting the PH test results on coxph
+pdf(file = "D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#07 Multivariable Cox Diagnostics/44 Multivariable Cox Proportional Hazard Test Plot (I).pdf",
+    width = 7, # The width of the plot in inches
+    height = 7) # The height of the plot in inches
+  
+for (i in 1:m)
+ {
+   d <- data.frame(mtest[[i]])
+   cfit <- with(d, coxph(Surv(time, recur) ~ Trt+demo_1+ demo_2+ demo_3+clinic_1+clinic_2+clinic_3+clinic_4)) 
+   plot(cox.zph(cfit, transform="km", global=TRUE), 
+        main=paste0("Plotting PH Test of MV Cox on coxph for ", datList$fit.dat$Y.ttf.lab[i]))
+   # cat("\n")
+}
+  dev.off() # Run dev.off() to create the file
+}
+
+```
+
+## Function MV Cox PH Test Result (II)
+```{r Testing of Proportional Hazards of multivariable model with cph, message=FALSE, warning=FALSE}
+MV.Cox.PH.Test.Result.2<-function(datList, mtest, m) {
+# P-values of testing Proportional Hazard assumption of MV Cox on cph
+output<-"D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#07 Multivariable Cox Diagnostics/45 Multivariable Cox Proportional Hazard Test Result (II).txt"
+sink(output, append=FALSE, split=FALSE, type = "output")
+cat("\n\n")
+
+for (i in 1:m)
+ {
+   d <- data.frame(mtest[[i]])
+   dist <- datadist(d) # Distribution summaries for predictor variables
+   options(datadist = "dist")
+   dsurv <- Surv(time = d$time, event = d$recur)
+   model_d <- cph(dsurv ~ Trt+demo_1+ demo_2+ demo_3+clinic_1+clinic_2+clinic_3+clinic_4, data = d,
+                  x = TRUE,
+                  y = TRUE,
+                  surv = TRUE) 
+   cat(paste0("PH Test of MV Cox on cph for ", datList$fit.dat$Y.ttf.lab[i]),"\n")
+   print(cox.zph(model_d, transform="km"))
+   cat("\n")
+  }
+sink()
+}  
+
+```
+  
+## Function MV Cox PH Test Plot (II)
+```{r Plot of Testing Proportional Hazards of Multivariable Model with cph, message=FALSE, warning=FALSE}
+MV.Cox.PH.Test.Plot.2<-function(datList, mtest, m) {
+# Plotting the PH test results on cph
+pdf(file = "D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#07 Multivariable Cox Diagnostics/46 Multivariable Cox Proportional Hazard Test Plot (II).pdf",
+    width = 7, # The width of the plot in inches
+    height = 7) # The height of the plot in inches
+
+for (i in 1:m)
+ {
+   d <- data.frame(mtest[[i]])
+   dist <- datadist(d) # Distribution summaries for predictor variables
+   options(datadist = "dist")
+   dsurv <- Surv(time = d$time, event = d$recur)
+   model_d <- cph(dsurv ~ Trt+demo_1+ demo_2+ demo_3+clinic_1+clinic_2+clinic_3+clinic_4, data = d,
+                  x = TRUE,
+                  y = TRUE,
+                  surv = TRUE) 
+   plot(cox.zph(model_d, transform="km", global=TRUE), 
+        main=paste0("Plotting PH Test of MV Cox on cph for ", datList$fit.dat$Y.ttf.lab[i]))
+   # cat("\n")
+}
+  dev.off() # Run dev.off() to create the file
+}
+
+```
+
+## Function MV Cox Influential Cases (I)
+```{r Checking influential cases of MV model with coxph, message=FALSE, warning=FALSE}
+MV.Cox.Influential.Cases.1<-function(datList, mtest, m){
+# Checking influential cases of MV Cox model with coxph on three covariates
+pdf(file = "D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#07 Multivariable Cox Diagnostics/47 Multivariable Cox Influential Cases Plot (I).pdf",
+    width = 7, # The width of the plot in inches
+    height = 7) # The height of the plot in inches
+
+for (i in 1:m)
+ {
+  d <- data.frame(mtest[[i]])
+  cfit <- with(d, coxph(Surv(time, recur) ~ Trt+demo_1+ demo_2+ demo_3+clinic_1+clinic_2+clinic_3+clinic_4)) 
+  dfbeta <- residuals(cfit, type="dfbeta") # type=dfbetas produces the estimated changes in the coefficients divided by their standard errors.
+  for (j in 1:3) # Checking for the first three covariates only
+  {
+  plot(dfbeta[,j],
+       ylab=names(coef(cfit))[j],
+       main=paste0("Checking influential cases of MV Cox on coxph for ", datList$fit.dat$Y.ttf.lab[i]))
+  abline(h=0, lty=2)
+  }
+}
+ dev.off() # Run dev.off() to create the file 
+}
+
+```
+
+## Function MV Cox Influential Cases (II)
+```{r Checking influential cases of MV model with cph, message=FALSE, warning=FALSE}
+MV.Cox.Influential.Cases.2<-function(datList, mtest, m) {
+# Checking influential cases of MV Cox model with cph on three covariates
+pdf(file = "D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#07 Multivariable Cox Diagnostics/48 Multivariable Cox Influential Cases Plot (II).pdf",
+    width = 7, # The width of the plot in inches
+    height = 7) # The height of the plot in inches
+  
+for (i in 1:m)
+ {
+  d <- data.frame(mtest[[i]])
+  dist <- datadist(d) # Distribution summaries for predictor variables
+  options(datadist = "dist")
+  dsurv <- Surv(time = d$time, event = d$recur)
+  model_d <- cph(dsurv ~ Trt+demo_1+ demo_2+ demo_3+clinic_1+clinic_2+clinic_3+clinic_4, data = d,
+                  x = TRUE,
+                  y = TRUE,
+                  surv = TRUE) 
+  dfbeta <- residuals(model_d, type="dfbeta") # type=dfbetas produces the estimated changes in the coefficients divided by their standard errors.
+  for (j in 1:3) # Checking for the first three covariates only
+  {
+   plot(dfbeta[,j],
+       ylab=names(coef(model_d))[j],
+       main=paste0("Checking influential cases of MV Cox on cph for ", datList$fit.dat$Y.ttf.lab[i]))
+  abline(h=0, lty=2)
+  }
+}
+  dev.off() # Run dev.off() to create the file
+}
+
+```
+
+## Function MV Cox Nonlinearity (I)
+```{r Checking nonlinearity of MV model with coxph, message=FALSE, warning=FALSE}
+MV.Cox.Nonlinearity.1<-function(datList, mtest, m) {
+# Checking nonlinearity of MV model of coxph on demo_3
+pdf(file = "D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#07 Multivariable Cox Diagnostics/49 Multivariable Cox Nonlinearity Plot (I).pdf",
+    width = 7, # The width of the plot in inches
+    height = 7) # The height of the plot in inches
+  
+for (i in 1:m)
+ {
+  d <- data.frame(mtest[[i]])
+  cfit <- with(d, coxph(Surv(time, recur) ~ Trt+demo_1+ demo_2+ demo_3+clinic_1+clinic_2+clinic_3+clinic_4)) 
+  nonlinear <- residuals(cfit, type="martingale") # The martingale residuals are plotted against covariates to detect nonlinearity, 
+  for (j in 4:4) # Checking for demo_3 only. Adjust j for other covariates 
+  {
+    plot(mtest[[i]][,j], nonlinear,
+       ylab="residuals",
+       xlab=paste0(names(mtest[[i]][j])),
+       main=paste0("Checking Nonlinearity of MV Cox on coxph for ", datList$fit.dat$Y.ttf.lab[i]))
+    abline(h=0, lty=2)
+  }        
+}
+  dev.off() # Run dev.off() to create the file
+}
+
+```
+
+## Function MV Cox Nonlinearity (II)
+```{r Checking nonlinearity of MV model with cph, message=FALSE, warning=FALSE}
+MV.Cox.Nonlinearity.2<-function(datList, mtest, m) {
+# Checking nonlinearity of MV model of cph on demo_3
+pdf(file = "D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#07 Multivariable Cox Diagnostics/50 Multivariable Cox Nonlinearity Plot (II).pdf",
+    width = 7, # The width of the plot in inches
+    height = 7) # The height of the plot in inches  
+  
+for (i in 1:m)
+ {
+  d <- data.frame(mtest[[i]])
+  dist <- datadist(d) # Distribution summaries for predictor variables
+  options(datadist = "dist")
+  dsurv <- Surv(time = d$time, event = d$recur)
+  model_d <- cph(dsurv ~ Trt+demo_1+ demo_2+ demo_3+clinic_1+clinic_2+clinic_3+clinic_4, data = d,
+                  x = TRUE,
+                  y = TRUE,
+                  surv = TRUE) 
+  nonlinear <- residuals(model_d, type="martingale") # The martingale residuals are plotted against covariates to detect nonlinearity, 
+  for (j in 4:4) # Checking for demo_3 only. Adjust j for other covariates 
+  {
+    plot(mtest[[i]][,j], nonlinear,
+       ylab="residuals",
+       xlab=paste0(names(mtest[[i]][j])),
+       main=paste0("Checking Nonlinearity of MV Cox on cph for ", datList$fit.dat$Y.ttf.lab[i]))
+    abline(h=0, lty=2)
+  }        
+}
+  dev.off() # Run dev.off() to create the file
+}
+
+```
+
+## Function MV Cox Collinearity Test
+```{r Assessing Collinearity of Multivariable Model with coxph, message=FALSE, warning=FALSE}
+MV.Cox.Collinearity.Test<-function(datList, mtest, m) {
+# Assessing Collinearity of Multivariable Model with coxph.
+output<-"D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#07 Multivariable Cox Diagnostics/51 Multivariable Cox Collinearity Test.txt"
+sink(output, append=FALSE, split=FALSE, type = "output")
+cat("\n\n")
+
+for (i in 1:m)
+ {
+   d <- data.frame(mtest[[i]])
+   cfit <- with(d, coxph(Surv(time, recur) ~ Trt+demo_1+ demo_2+ demo_3+clinic_1+clinic_2+clinic_3+clinic_4))
+   cat(paste0("Assessing Collinearity with coxph for ", datList$fit.dat$Y.ttf.lab[i]), "\n")
+   print(vif(cfit))
+   cat("\n")
+}
+sink()
+}
+
+```
+
+## Function MV Cox Validation
+```{r Validating Summaries of Multivariable Model with cph, message=FALSE, warning=FALSE}
+MV.Cox.Validation<-function(datList, mtest, m) {
+# Validating Summaries of Multivariable Model with cph.
+output<-"D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/Output/#07 Multivariable Cox Diagnostics/52 Multivariable Cox Validation.txt"
+sink(output, append=FALSE, split=FALSE, type = "output")
+cat("\n\n")
+
+for (i in 1:m)
+ {
+   d <- data.frame(mtest[[i]])
+   dist <- datadist(d) # Distribution summaries for predictor variables
+   options(datadist = "dist")
+   dsurv <- Surv(time = d$time, event = d$recur)
+   model_d <- cph(dsurv ~ Trt+demo_1+demo_2+demo_3+clinic_1+clinic_2+clinic_3+clinic_4,
+                  data = d,
+                  x = TRUE,
+                  y = TRUE,
+                  surv = TRUE) 
+   cat(paste0(datList$fit.dat$Y.ttf.lab[i]), "\n") # Indicate the label of event
+   set.seed(43201)
+   print(validate(model_d), B=100)
+  cat("\n")
+}
+sink()
+}
+
+```
+
+
+# Survival Anaysis
+## Section 01: Survival Estimate
+```{r Survival estimate, message=FALSE, warning=FALSE}
+
+### 01 Create and Save Follow-Up Summary 
+load("D:/GI-Ming/000 CWRU Statistical Analyst/Projects/015 Comprehensive Export of Survival Analysis (NDY)/R Code/Workspace.Rdata")  # This Workspace includes Eda-example Data List (datList) and all Survival Functions
+m<-3 # Three events: LR, DM, OS
+Data.List.complete<-followup.summary(datList,m) 
+  # The datList is the data list created by function "Create Data List"
+  # Data.List.complete is the datList of complete cases.
+
+### 02 Create and Save Survival Object 
+survival.object<-survival.object(Data.List.complete,m) 
+
+### 03 Create and Save K-M Survival Summary 
+KM.survival.summary<-KM.survival.summary(Data.List.complete, m, survival.object) 
+
+### 04 Create and Save K-M Survival List 
+KM.survival.list<-KM.survival.list(Data.List.complete, m, KM.survival.summary)
+
+### 05 Create and Save K-M Survival Curve (I) 
+KM.survival.curve.1(Data.List.complete, m, KM.survival.summary) # Basic grpah
+
+### 06 Create and Save K-M Survival Curve (II) 
+Data.List.complete.stratified<-KM.survival.curve.2(datList, m) 
+    # Advanced graph
+    # Use raw datList with no deletion of missing data
+    # Retrun data list with complete cases and stratified by Treatment for furture use
+
+```
+
+## Section 02: Hazard Estimate
+```{r Hazard estimate, message=FALSE, warning=FALSE}
+### 07 Create and Save Inverse K-M Hazard Estimate 
+Inverse.KM.Hazard.Estiamte<-Inverse.KM.Hazard.Estiamte(Data.List.complete, m, KM.survival.summary)
+
+### 08 Create and Save Inverse K-M Hazard Plot 
+Inverse.KM.Hazard.Plot(Data.List.complete, m, Inverse.KM.Hazard.Estiamte)
+
+### 09 Create and Save Inverse K-M Plus N-A Hazard Estimate 
+Inverse.KM.Plus.NA.Hazard.Estimate<-Inverse.KM.Plus.NA.Hazard.Estimate(Data.List.complete, m, KM.survival.summary, Inverse.KM.Hazard.Estiamte)
+
+### 10 Print and Save Inverse K-M Plus N-A Hazard Plot 
+Inverse.KM.Plus.NA.Hazard.Plot(Data.List.complete, m, Inverse.KM.Plus.NA.Hazard.Estimate)
+
+```
+
+## Section 03: Stratified Survival Estimate
+```{r stratified Survival estimate, message=FALSE, warning=FALSE}
+### 11 Create and Save Stratified K-M Survival Summary 
+Stratified.KM.Survival.Summary<-Stratified.KM.Survival.Summary(Data.List.complete, Data.List.complete.stratified, m)
+
+### 12 Create and Save Stratified Comprehensive Survival Analysis
+Stratified.Comprehensive.Survival.Analysis(Data.List.complete, Data.List.complete.stratified, m)
+
+### 13 Create and Save Stratified K-M Survival List
+Stratified.KM.Survival.List<-Stratified.KM.Survival.List(Data.List.complete, m, Stratified.KM.Survival.Summary)
+
+### 14 Create and Save Stratified K-M Curve (I)
+Stratified.KM.Curve.1(Data.List.complete, m, Stratified.KM.Survival.Summary)
+
+### 15 Create and Save Stratified K-M Curve (II)
+Stratified.KM.Curve.2(datList, m) # Use raw data list with no deletion of missing data
+
+### 16 Create and Save Log-Rank Test
+Log.Rank.Test(Data.List.complete, Data.List.complete.stratified, m)
+
+```
+
+## Section 04: Simple Cox Regression
+```{r simple cox regression, message=FALSE, warning=FALSE}
+### 17 Create and Save Simple Cox Summary (I)
+Simple.Cox.Summary.1(Data.List.complete, Data.List.complete.stratified, m) # Fitting cox model by treatment with coxph
+
+### 18 Create and Save Simple Cox Summary (II)
+Simple.Cox.Summary.2(Data.List.complete, Data.List.complete.stratified, m) # Fitting cox model by treatment with cph
+
+### 19 Create and Save Baseline Survival Plot (I)
+Baseline.Survival.Plot.1(Data.List.complete, Data.List.complete.stratified, m) # Baseline survival plot of simple model with coxph
+
+### 20 Creaate an Save Baseline Survival Plot (II)
+Baseline.Survival.Plot.2(Data.List.complete, Data.List.complete.stratified, m) # Baseline survival plot of simple model with cph
+
+### 21 Create and Save Baseline Hazard Plot (I)
+Baseline.Hazard.Plot.1(Data.List.complete, Data.List.complete.stratified, m) # Baseline Cumulative Hazard Plot of Simple Model with coxph
+
+### 22 Create and Save Baseline Hazard Plot (II)
+Baseline.Hazard.Plot.2(Data.List.complete, Data.List.complete.stratified, m) # Baseline Cumulative Hazard Plot of Simple Model with cph
+
+### 23 Create and Save Simple Cox Stratified Survival Plot (I)
+Simple.Cox.Survival.Plot.1(Data.List.complete, Data.List.complete.stratified, m) # Survival plot by treatment with coxph.
+
+### 24 Create and Save Simple Cox Stratified Survival Plot (II)
+Simple.Cox.Survival.Plot.2(Data.List.complete, Data.List.complete.stratified, m) # Survival plot by treatment with cph.
+
+### 25 Create and Save Simple Cox Stratified Hazard Plot
+Simple.Cox.Hazard.Plot(Data.List.complete, Data.List.complete.stratified, m)
+
+### 26 Create and Save Simple Cox Hazard Ratio Effect
+Simple.Cox.HR.Effect(Data.List.complete, Data.List.complete.stratified, m)
+
+```
+
+## Section 05: Simple Cox Diagnostics
+```{r Simple Cox Diagnostics, message=FALSE, warning=FALSE}
+### 27 Create and Save Simple Cox Proportional Hazard Test Result (I)
+Simple.Cox.Diagnostics.Result.1(Data.List.complete, Data.List.complete.stratified, m) # Get P-values of testing Proportional Hazard assumption of simple Cox on coxph
+
+### 28 Create and Save Simple Cox Proportional Hazard Test Plot (I)
+Simple.Cox.Diagnostics.Plot.1(Data.List.complete, Data.List.complete.stratified, m) # Plot of testing Proportional Hazard assumption of simple Cox on coxph
+
+### 29 Create and Save Simple Cox Proportional Hazard Test (II)
+Simple.Cox.Diagnostics.Result.2(Data.List.complete, Data.List.complete.stratified, m) # Get P-values of testing Proportional Hazard assumption of simple Cox on cph
+
+### 30 Create and Save Simple Cox Proportional Hazard Test Plot (II)
+Simple.Cox.Diagnostics.Plot.2(Data.List.complete, Data.List.complete.stratified, m) # Plot of testing Proportional Hazard assumption of simple Cox on cph
+
+### 31 Create and Save Simple Cox Influential Cases Plot (I)
+Simple.Cox.Influential.Cases.1(Data.List.complete, Data.List.complete.stratified, m) # Checking influential cases of Cox model with coxph
+
+### 32 Create and Save Simple Cox Influential Cases (II)
+Simple.Cox.Influential.Cases.2(Data.List.complete, Data.List.complete.stratified, m) # Checking influential cases of Cox model with cph
+
+### 33 Create and Save Simple Cox Validation
+Simple.Cox.Validation(Data.List.complete, Data.List.complete.stratified, m) # Resampling validation of Cox model with cph
+
+```
+
+## MV Cox Regression
+```{r Multivariable Cox Regression, message=FALSE, warning=FALSE}
+### 34 Create and Save Tableone Summary
+Data.MV<-Tableone.Summary(datList) 
+    # Use raw data of all information
+    # Return data of Data.MV of all the informatin for multivariable Cox regression analysis
+
+### 35 Create and Save Multivariable Cox Summary (I)
+List.MV.complete<-MV.Cox.Summary.1(Data.List.complete, Data.MV, m) 
+    # Build multivariable Cox model of coxph 
+    # Return list(3) of List.MV.complete with complete cases transormed from dataframe Data.MV
+
+### 36 Create and Save Multivariable Cox Summary (II)
+MV.Cox.Summary.2(Data.List.complete, List.MV.complete, m) # Build multivariable Cox model of cph
+
+### 37 Create and Save Comprehensive Multivariable Cox Analysis
+Comprehensive.MV.Cox.Analysis(Data.List.complete, List.MV.complete, m) # Build comprehensive multivariable Cox anslysis
+
+### 38 Create and Save Multivariable Cox Survival Plot (I)
+MV.Cox.Survival.Plot.1(Data.List.complete, List.MV.complete, m) # With coxph
+
+### 39 Create and Save Multivariable Cox Survival Plot (II)
+MV.Cox.Survival.Plot.2(Data.List.complete, List.MV.complete, m) # With cph
+
+### 40 Create and Save Multivariable Cox Hazard Plot (I)
+MV.Cox.Hazard.Plot.1(Data.List.complete, List.MV.complete, m) # With coxph
+
+### 41 Create and Save Multivariable Cox Hazard Plot (II)
+MV.Cox.Hazard.Plot.2(Data.List.complete, List.MV.complete, m) # With cph
+
+### 42 Create and Save Multivariable Cox Hazard Ratio Effect 
+MV.Cox.HR.Effect(Data.List.complete, List.MV.complete, m)
+
+```
+
+## MV Cox Diagnostics
+```{r Multivariable Cox Diagnostics, message=FALSE, warning=FALSE}
+### 43 Create and Save Multivariable Cox Proportional Hazard Test Result (I)
+MV.Cox.PH.Test.Result.1(Data.List.complete, List.MV.complete, m) # with coxph
+
+### 44 Create and Save Multivariable Cox Proportional Hazard Test Plot  (I)
+MV.Cox.PH.Test.Plot.1(Data.List.complete, List.MV.complete, m) # with coxph
+
+### 45 Create and Save Multivariable Cox Proportional Hazard Test Result (II)
+MV.Cox.PH.Test.Result.2(Data.List.complete, List.MV.complete, m) # with cph
+
+### 46 Create and Save Multivariable Cox Proportional Hazard Test Plot  (II)
+MV.Cox.PH.Test.Plot.2(Data.List.complete, List.MV.complete, m) # with cph
+
+### 47 Create and Save Multivariable Cox Influential Cases Plot (I)
+MV.Cox.Influential.Cases.1(Data.List.complete, List.MV.complete, m) # with coxph, Checking for the first three covariates only
+
+### 48 Create and Save Multivariable Cox Influential Cases Plot (II)
+MV.Cox.Influential.Cases.2(Data.List.complete, List.MV.complete, m) # with cph, Checking for the first three covariates only
+
+### 49 Create and Save Multivariable Cox Nonlinearity Plot (I)
+MV.Cox.Nonlinearity.1(Data.List.complete, List.MV.complete, m) # with coxph, Checking for demo_3 only
+
+### 50 Create and Save Multivariable Cox Nonlinearity Plot (II)
+MV.Cox.Nonlinearity.2(Data.List.complete, List.MV.complete, m) # with cph, Checking for demo_3 only
+
+### 51 Create and Save Multivariable Cox Collinearity Test
+MV.Cox.Collinearity.Test(Data.List.complete, List.MV.complete, m)
+
+### 52 Create and Save Multivariable Cox Validation
+MV.Cox.Validation(Data.List.complete, List.MV.complete, m)
+
+```
+
+
+
+
